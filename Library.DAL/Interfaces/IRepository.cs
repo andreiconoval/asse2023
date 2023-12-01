@@ -2,7 +2,7 @@
 
 namespace Library.DAL.Interfaces
 {
-    interface IRepository<T>
+    public interface IRepository<T>
     {
         void Insert(T entity);
 

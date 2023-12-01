@@ -2,7 +2,7 @@
 
 namespace Library.DAL.Interfaces
 {
-    interface IBookAuthorRepository: IRepository<BookAuthor>
+    interface IBookAuthorRepository : IRepository<BookAuthor>
     {
     }
 }

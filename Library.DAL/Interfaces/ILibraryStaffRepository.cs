@@ -2,7 +2,7 @@
 
 namespace Library.DAL.Interfaces
 {
-    interface ILibraryStaffRepository : IRepository<LibraryStaff>
+    public interface ILibraryStaffRepository : IRepository<LibraryStaff>
     {
     }
 }

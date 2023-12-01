@@ -2,7 +2,7 @@
 
 namespace Library.DAL.Interfaces
 {
-    interface IReaderLoanRepository : IRepository<ReaderLoan>
+    public  interface IReaderLoanRepository : IRepository<ReaderLoan>
     {
     }
 }
