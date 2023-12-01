@@ -4,7 +4,7 @@ using Library.DAL.Interfaces;
 
 namespace Library.DAL.DataMapper
 {
-    abstract class BaseRepository<T> : IRepository<T>
+    public abstract class BaseRepository<T> : IRepository<T>
         where T : class
     {
         public virtual IEnumerable<T> Get(
