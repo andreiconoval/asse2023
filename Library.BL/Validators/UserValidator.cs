@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
 using Library.DAL.DomainModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Library.BL.Validators
 {
+    [ExcludeFromCodeCoverage]
     class UserValidator : AbstractValidator<User>
     {
         public UserValidator()
