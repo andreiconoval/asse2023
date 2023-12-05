@@ -31,7 +31,7 @@ namespace Library.BL.Services
         /// <returns>
         ///   The validation result.
         /// </returns>
-        public ValidationResult Insert(T entity)
+        public virtual ValidationResult Insert(T entity)
         {
             try
             {
@@ -39,7 +39,11 @@ namespace Library.BL.Services
                 if (result.IsValid)
                 {
                     _repository.Insert(entity);
-                    _logger.LogInformation("Add new Author");
+                    _logger.LogInformation($"Add new {nameof(T)}");
+                }
+                else
+                {
+                    _logger.LogInformation($"Cannot add new {nameof(T)}, entity is invalid");
                 }
 
                 return result;
@@ -52,7 +56,7 @@ namespace Library.BL.Services
 
         }
 
-        public ValidationResult Update(T entity)
+        public virtual ValidationResult Update(T entity)
         {
             var result = _validator.Validate(entity);
             if (result.IsValid)
@@ -65,17 +69,17 @@ namespace Library.BL.Services
 
         /// <summary>Deletes the specified entity.</summary>
         /// <param name="entity">The entity to be deleted.</param>
-        public void Delete(T entity)
+        public virtual void Delete(T entity)
         {
             _repository.Delete(entity);
         }
 
-        public T GetByID(object id)
+        public virtual T GetByID(object id)
         {
             return _repository.GetByID(id);
         }
 
-        public IEnumerable<T> GetAll()
+        public virtual IEnumerable<T> GetAll()
         {
             return _repository.Get();
         }

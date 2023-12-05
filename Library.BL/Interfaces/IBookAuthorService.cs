@@ -2,7 +2,7 @@
 
 namespace Library.BL.Interfaces
 {
-    interface IBookAuthorService : IService<BookAuthor>
+    public interface IBookAuthorService : IService<BookAuthor>
     {
     }
 }
