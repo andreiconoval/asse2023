@@ -2,6 +2,7 @@
 using FluentValidation.Results;
 using Library.BL.Interfaces;
 using Library.DAL.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Library.BL.Services
 {
@@ -11,16 +12,18 @@ namespace Library.BL.Services
     {
         protected U _repository;
         protected IValidator<T> _validator;
+        protected ILogger _logger;
 
         /// <summary>
         /// Ctor for base service
         /// </summary>
         /// <param name="repository">The actual repository that will fit into this class</param>
         /// <param name="validator">The fluent validation validator</param>
-        public BaseService(U repository, IValidator<T> validator)
+        public BaseService(U repository, IValidator<T> validator, ILogger logger)
         {
             _repository = repository;
             _validator = validator;
+            _logger = logger;
         }
 
         /// <summary>Inserts the specified entity.</summary>
@@ -30,13 +33,23 @@ namespace Library.BL.Services
         /// </returns>
         public ValidationResult Insert(T entity)
         {
-            var result = _validator.Validate(entity);
-            if (result.IsValid)
+            try
             {
-                _repository.Insert(entity);
+                var result = _validator.Validate(entity);
+                if (result.IsValid)
+                {
+                    _repository.Insert(entity);
+                    _logger.LogInformation("Add new Author");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "Log on error add");
+                throw;
             }
 
-            return result;
         }
 
         public ValidationResult Update(T entity)
@@ -65,16 +78,6 @@ namespace Library.BL.Services
         public IEnumerable<T> GetAll()
         {
             return _repository.Get();
-        }
-
-        ValidationResult IService<T>.Insert(T entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        ValidationResult IService<T>.Update(T entity)
-        {
-            throw new NotImplementedException();
         }
     }
 }

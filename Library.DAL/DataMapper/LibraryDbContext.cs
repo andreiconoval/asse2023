@@ -1,5 +1,5 @@
-﻿using System.Data.Entity;
-using Library.DAL.DomainModel;
+﻿using Library.DAL.DomainModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace Library.DAL.DataMapper
 {
@@ -19,59 +19,103 @@ namespace Library.DAL.DataMapper
         public DbSet<BookLoanDetail> BookLoanDetails { get; set; }
 
 
-        public LibraryDbContext()
-    : base("myConStr")
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            optionsBuilder.UseMySQL("server=localhost;database=asse_library;user=root;password=mysqladmin");
         }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
             modelBuilder.Entity<Book>()
                 .HasMany(b => b.BookDomains)
-                .WithRequired()
+                .WithOne()
                 .HasForeignKey(bd => bd.BookId);
 
             modelBuilder.Entity<Domain>()
                 .HasMany(d => d.BookDomains)
-                .WithRequired()
+                .WithOne()
                 .HasForeignKey(bd => bd.DomainId);
 
             modelBuilder.Entity<Book>()
                 .HasMany(b => b.BookAuthors)
-                .WithRequired()
+                .WithOne()
                 .HasForeignKey(ba => ba.BookId);
 
             modelBuilder.Entity<Author>()
                 .HasMany(a => a.BookAuthors)
-                .WithRequired()
+                .WithOne()
                 .HasForeignKey(ba => ba.AuthorId);
 
             modelBuilder.Entity<Book>()
                 .HasMany(b => b.BookEditions)
-                .WithRequired()
+                .WithOne()
                 .HasForeignKey(be => be.BookId);
 
             modelBuilder.Entity<BookEdition>()
                 .HasMany(be => be.BookSamples)
-                .WithRequired()
+                .WithOne()
                 .HasForeignKey(bs => bs.BookEditionId);
 
             modelBuilder.Entity<User>()
-                .HasOptional(u => u.Reader)
-                .WithRequired(r => r.User);
+                .HasOne(u => u.Reader)
+                .WithOne(r => r.User);
 
             modelBuilder.Entity<User>()
-                .HasOptional(u => u.LibraryStaff)
-                .WithRequired(ls => ls.User);
+                .HasOne(u => u.LibraryStaff)
+                .WithOne(ls => ls.User);
 
             modelBuilder.Entity<Reader>()
                 .HasMany(r => r.ReaderLoans)
-                .WithRequired(rl => rl.Reader);
+                .WithOne(rl => rl.Reader);
 
             modelBuilder.Entity<ReaderLoan>()
                 .HasMany(rl => rl.BookLoanDetails)
-                .WithRequired(bld => bld.ReaderLoan);
+                .WithOne(bld => bld.ReaderLoan);
+
+            modelBuilder.Entity<BookAuthor>()
+                .HasKey(ba => new { ba.BookId, ba.AuthorId });
+
+            modelBuilder.Entity<BookAuthor>()
+                .HasOne(ba => ba.Book)
+                .WithMany(b => b.BookAuthors)
+                .HasForeignKey(ba => ba.BookId);
+
+            modelBuilder.Entity<BookAuthor>()
+                .HasOne(ba => ba.Author)
+                .WithMany(a => a.BookAuthors)
+                .HasForeignKey(ba => ba.AuthorId);
+
+
+            modelBuilder.Entity<BookDomain>()
+            .HasKey(ba => new { ba.BookId, ba.DomainId });
+
+            modelBuilder.Entity<BookDomain>()
+                .HasOne(ba => ba.Book)
+                .WithMany(b => b.BookDomains)
+                .HasForeignKey(ba => ba.BookId);
+
+            modelBuilder.Entity<BookDomain>()
+                .HasOne(ba => ba.Domain)
+                .WithMany(a => a.BookDomains)
+                .HasForeignKey(ba => ba.DomainId);
+
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    // Map the database column name based on the property name
+                    property.SetColumnName(ConvertPropertyNameToColumnName(property.Name));
+                }
+            }
+        }
+
+        private static string ConvertPropertyNameToColumnName(string propertyName)
+        {
+            // Implement your naming convention logic here
+            // For example, convert PascalCase to snake_case
+            return string.Concat(propertyName.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString())).ToLower();
         }
     }
 }

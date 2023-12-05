@@ -2,12 +2,13 @@
 using Library.BL.Validators;
 using Library.DAL.DomainModel;
 using Library.DAL.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace Library.BL.Services
 {
     public class BookAuthorService : BaseService<BookAuthor, BookAuthorRepository>, IBookAuthorService
     {
-        public BookAuthorService(BookAuthorRepository repository) : base(repository, new BookAuthorValidator())
+        public BookAuthorService(BookAuthorRepository repository, ILogger logger) : base(repository, new BookAuthorValidator(), logger)
         {
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Library.BL.Interfaces
 {
-    interface IUserService : IService<User>
+    public interface IUserService : IService<User>
     {
     }
 }

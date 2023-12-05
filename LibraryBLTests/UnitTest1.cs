@@ -1,4 +1,6 @@
 
+using Library.BL.Infrastructure;
+using Library.BL.Interfaces;
 using Library.BL.Services;
 using Library.DAL.DomainModel;
 using Library.DAL.Interfaces;
@@ -15,7 +17,8 @@ namespace LibraryBLTests
         public Tests()
         {
             userRepositoryMock = new Mock<IUserRepository>();
-            userService = new UserService(userRepositoryMock.Object);
+            var logger = LoggerExtensions.TestLoggingInstance<IUserService>();
+            userService = new UserService(userRepositoryMock.Object, logger);
         }
 
         [SetUp]

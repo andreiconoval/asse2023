@@ -1,6 +1,6 @@
-﻿using System.Data.Entity;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Library.DAL.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Library.DAL.DataMapper
 {
