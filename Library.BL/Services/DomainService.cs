@@ -15,6 +15,12 @@ namespace Library.BL.Services
             _bookDomainService = bookDomainService;
         }
 
+        /// <summary>
+        /// Add new domain
+        /// </summary>
+        /// <param name="entity">Domain</param>
+        /// <returns>Validation Result</returns>
+        /// <exception cref="ArgumentException"></exception>
         public override ValidationResult Insert(Domain entity)
         {
             try
@@ -72,7 +78,9 @@ namespace Library.BL.Services
                     throw new ArgumentException("Cannot update user, entity is missing");
                 }
 
-
+                databaseDomain.DomainName = domain.DomainName;
+                databaseDomain.DomainId = domain.DomainId;
+                _repository.Update(databaseDomain);
                 return result;
             }
             catch (Exception ex)

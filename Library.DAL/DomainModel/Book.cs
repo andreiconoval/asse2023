@@ -15,6 +15,8 @@ public class Book
 
     public int YearPublication { get; set; }
 
+    public bool Arhived { get; set; }
+
     public virtual ICollection<BookDomain> BookDomains { get; set; }
 
     public virtual ICollection<BookAuthor> BookAuthors { get; set; }

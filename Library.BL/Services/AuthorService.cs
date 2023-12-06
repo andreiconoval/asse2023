@@ -15,7 +15,7 @@ namespace Library.BL.Services
             _bookAuthorservice = bookAuthorService;
         }
 
-        #region 
+        #region Public
 
         public void DeleteAuthor(int id, bool hardDelete)
         {

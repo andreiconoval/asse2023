@@ -63,6 +63,12 @@ namespace Library.BL.Services
             }
         }
 
+        /// <summary>
+        /// Update user based on email or id
+        /// Email and Id are not updated
+        /// </summary>
+        /// <param name="user">User entity</param>
+        /// <exception cref="ArgumentException"></exception>
         public void UpdateUser(User user)
         {
             var result = _validator.Validate(user);
