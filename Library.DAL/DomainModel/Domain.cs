@@ -18,6 +18,7 @@ namespace Library.DAL.DomainModel
         [ForeignKey("DomainId")]
         public virtual Domain ParentDomain { get; set; }
 
+        public virtual ICollection<Domain> Subdomains { get; set; }
         public virtual ICollection<BookDomain> BookDomains { get; set; }
     }
 }

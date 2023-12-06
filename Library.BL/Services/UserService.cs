@@ -79,8 +79,8 @@ namespace Library.BL.Services
 
             if (databaseAuthor == null)
             {
-                _logger.LogInformation("Cannot update author, entity is missing");
-                throw new ArgumentException("Cannot update author, entity is missing");
+                _logger.LogInformation("Cannot update user, entity is missing");
+                throw new ArgumentException("Cannot update user, entity is missing");
             }
 
             databaseAuthor.FirstName = user.FirstName;

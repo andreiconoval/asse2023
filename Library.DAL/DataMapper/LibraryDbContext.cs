@@ -36,6 +36,16 @@ namespace Library.DAL.DataMapper
                 .HasMany(d => d.BookDomains)
                 .WithOne()
                 .HasForeignKey(bd => bd.DomainId);
+           
+            modelBuilder.Entity<Domain>()
+               .HasMany(d => d.Subdomains)
+               .WithOne()
+               .HasForeignKey(bd => bd.DomainId);
+
+            modelBuilder.Entity<Domain>()
+                .HasOne(ba => ba.ParentDomain)
+                .WithMany(b => b.Subdomains)
+                .HasForeignKey(ba => ba.DomainId);
 
             modelBuilder.Entity<Book>()
                 .HasMany(b => b.BookAuthors)

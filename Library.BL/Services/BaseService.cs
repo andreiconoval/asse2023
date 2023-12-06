@@ -74,11 +74,20 @@ namespace Library.BL.Services
             _repository.Delete(entity);
         }
 
+        /// <summary>
+        /// Get entity based on Id
+        /// </summary>
+        /// <param name="id"> Id of entity</param>
+        /// <returns></returns>
         public virtual T GetByID(object id)
         {
             return _repository.GetByID(id);
         }
 
+        /// <summary>
+        /// Get all entities
+        /// </summary>
+        /// <returns>Return list of entities</returns>
         public virtual IEnumerable<T> GetAll()
         {
             return _repository.Get();
