@@ -5,7 +5,6 @@ using Library.BL.Services;
 using Library.DAL.DomainModel;
 using Library.DAL.Interfaces;
 using Moq;
-using Rhino.Mocks;
 
 namespace LibraryBLTests
 {
