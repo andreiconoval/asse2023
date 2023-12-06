@@ -74,8 +74,9 @@ namespace LibraryBLTests
         [Test]
         public void AddUser_UserExists_Test()
         {
-            var user = new User() { 
-                FirstName = "FirstName", 
+            var user = new User()
+            {
+                FirstName = "FirstName",
                 LastName = "LastName",
                 Address = "Address",
                 Phone = "000000",
@@ -119,23 +120,38 @@ namespace LibraryBLTests
         [Test]
         public void UdateAuthor_Success_Test()
         {
-            var author = new Author() { FirstName = "FirstName", LastName = "LastName", Id = ID };
+            var user = new User()
+            {
+                Id = ID,
+                FirstName = "FirstName",
+                LastName = "LastName",
+                Address = "Address",
+                Phone = "000000",
+                Email = "Email"
+            };
 
-            _authorRepositoryMock.Setup(x => x.Get(It.IsAny<Expression<Func<Author, bool>>>(), It.IsAny<Func<IQueryable<Author>, IOrderedQueryable<Author>>>(), It.IsAny<string>())).Returns(new List<Author>() { author });
+            _userRepositoryMock.Setup(x => x.Get(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<Func<IQueryable<User>, IOrderedQueryable<User>>>(), It.IsAny<string>())).Returns(new List<User>() { user });
 
-            _authorService.UpdateAuthor(author);
+            _userService.UpdateUser(user);
             Assert.Pass();
         }
 
         [Test]
         public void UdateAuthor_MissingAuthor_Test()
         {
-            var author = new Author() { FirstName = "FirstName", LastName = "LastName", Id = ID };
+            var user = new User()
+            {
+                Id = ID,
+                FirstName = "FirstName",
+                LastName = "LastName",
+                Address = "Address",
+                Phone = "000000",
+                Email = "Email"
+            };
+            _userRepositoryMock.Setup(x => x.Get(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<Func<IQueryable<User>, IOrderedQueryable<User>>>(), It.IsAny<string>())).Returns(new List<User>() { });
 
-            _authorRepositoryMock.Setup(x => x.Get(It.IsAny<Expression<Func<Author, bool>>>(), It.IsAny<Func<IQueryable<Author>, IOrderedQueryable<Author>>>(), It.IsAny<string>())).Returns(new List<Author>() { });
-
-            var ex = Assert.Throws<ArgumentException>(() => _authorService.UpdateAuthor(author));
-            Assert.That(ex.Message, Is.EqualTo("Cannot update author, entity is missing"));
+            var ex = Assert.Throws<ArgumentException>(() => _userService.UpdateUser(user));
+            Assert.That(ex.Message, Is.EqualTo("Cannot update user, entity is missing"));
             Assert.Pass();
         }
 
