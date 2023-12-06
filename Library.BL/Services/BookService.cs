@@ -81,16 +81,16 @@ namespace Library.BL.Services
                     throw new ArgumentException("Cannot update book, invalid entity");
                 }
 
-                var databaseDomain = _repository.Get(i => i.Id == book.Id).FirstOrDefault();
-                if (databaseDomain == null)
+                var databaseBook= _repository.Get(i => i.Id == book.Id).FirstOrDefault();
+                if (databaseBook == null)
                 {
                     _logger.LogInformation("Cannot update book, entity is missing");
                     throw new ArgumentException("Cannot update book, entity is missing");
                 }
 
-                databaseDomain.Title = book.Title;
-                databaseDomain.YearPublication = book.YearPublication;
-                _repository.Update(databaseDomain);
+                databaseBook.Title = book.Title;
+                databaseBook.YearPublication = book.YearPublication;
+                _repository.Update(databaseBook);
 
                 return result;
             }
@@ -123,13 +123,13 @@ namespace Library.BL.Services
                 if (!hardDelete && (fullDatabaseBook.BookDomains.Any() || fullDatabaseBook.BookDomains.Any()))
                 {
                     _logger.LogInformation("Cannot delete book, entity has relations");
-                    throw new ArgumentException("Cannot delete domain, entity has relations");
+                    throw new ArgumentException("Cannot delete book, entity has relations");
                 }
 
                 if(fullDatabaseBook.BookEditions.Any())
                 {
                     _logger.LogInformation("Cannot delete book with editions, mark archived instead");
-                    throw new ArgumentException("Cannot delete domain with editions, mark archived instead");
+                    throw new ArgumentException("Cannot delete book with editions, mark archived instead");
                 }
 
                 if (fullDatabaseBook.BookDomains.Any())
