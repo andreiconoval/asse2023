@@ -101,6 +101,30 @@ namespace Library.BL.Services
             }
         }
 
+        public void UpdateAuthor(Author author)
+        {
+            var result = _validator.Validate(author);
+
+            if (author == null || author.Id == 0 || !result.IsValid)
+            {
+                _logger.LogInformation("Cannot update author, invalid entity");
+                throw new ArgumentException("Cannot update author, invalid entity");
+            }
+
+            var databaseAuthor = _repository.Get(i => i.Id == author.Id).FirstOrDefault();
+
+            if (databaseAuthor == null)
+            {
+                _logger.LogInformation("Cannot update author, entity is missing");
+                throw new ArgumentException("Cannot update author, entity is missing");
+            }
+
+            databaseAuthor.FirstName = author.FirstName;
+            databaseAuthor.LastName = author.LastName;
+
+            _repository.Update(databaseAuthor);
+        }
+
         #endregion
     }
 }

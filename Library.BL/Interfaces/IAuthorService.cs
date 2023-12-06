@@ -10,5 +10,7 @@ namespace Library.BL.Interfaces
         
         int AddAuthor(Author author);
 
+        void UpdateAuthor(Author author);
+
     }
 }

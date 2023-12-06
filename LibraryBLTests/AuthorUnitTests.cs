@@ -139,5 +139,39 @@ namespace LibraryBLTests
             Assert.That(result, Is.EqualTo(ID));
             Assert.Pass();
         }
+
+
+        [Test]
+        public void UpdateAuthor_InvalidAuthor_Test()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => _authorService.UpdateAuthor(new Author()));
+            Assert.That(ex.Message, Is.EqualTo("Cannot update author, invalid entity"));
+            Assert.Pass();
+        }
+
+
+        [Test]
+        public void UdateAuthor_Success_Test()
+        {
+            var author = new Author() { FirstName = "FirstName", LastName = "LastName", Id = ID };
+
+            _authorRepositoryMock.Setup(x => x.Get(It.IsAny<Expression<Func<Author, bool>>>(), It.IsAny<Func<IQueryable<Author>, IOrderedQueryable<Author>>>(), It.IsAny<string>())).Returns(new List<Author>() { author });
+
+            _authorService.UpdateAuthor(author);
+            Assert.Pass();
+        }
+
+        [Test]
+        public void UdateAuthor_MissingAuthor_Test()
+        {
+            var author = new Author() { FirstName = "FirstName", LastName = "LastName", Id = ID };
+
+            _authorRepositoryMock.Setup(x => x.Get(It.IsAny<Expression<Func<Author, bool>>>(), It.IsAny<Func<IQueryable<Author>, IOrderedQueryable<Author>>>(), It.IsAny<string>())).Returns(new List<Author>() { });
+
+            var ex = Assert.Throws<ArgumentException>(() => _authorService.UpdateAuthor(author));
+            Assert.That(ex.Message, Is.EqualTo("Cannot update author, entity is missing"));
+            Assert.Pass();
+        }
+
     }
 }
