@@ -5,9 +5,11 @@ using Library.BL.Services;
 using Library.DAL.DomainModel;
 using Library.DAL.Interfaces;
 using Moq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LibraryBLTests
 {
+    [ExcludeFromCodeCoverage]
     public class Tests
     {
         UserService userService;

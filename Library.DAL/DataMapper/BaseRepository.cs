@@ -1,9 +1,11 @@
-﻿using System.Linq.Expressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using Library.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Library.DAL.DataMapper
 {
+    [ExcludeFromCodeCoverage]
     public abstract class BaseRepository<T> : IRepository<T>
         where T : class
     {

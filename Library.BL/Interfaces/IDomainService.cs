@@ -2,7 +2,8 @@
 
 namespace Library.BL.Interfaces
 {
-    interface IDomainService : IService<Domain>
+    public interface IDomainService : IService<Domain>
     {
+        void Delete(Domain domain, bool hardDelete);
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Library.DAL.DomainModel
 {
+    [ExcludeFromCodeCoverage]
     public class User
     {
         [Key]

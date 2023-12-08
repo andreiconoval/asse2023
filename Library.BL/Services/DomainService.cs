@@ -66,16 +66,16 @@ namespace Library.BL.Services
 
                 if (!result.IsValid)
                 {
-                    _logger.LogInformation("Cannot update user, invalid entity");
-                    throw new ArgumentException("Cannot update user, invalid entity");
+                    _logger.LogInformation("Cannot update domain, invalid entity");
+                    throw new ArgumentException("Cannot update domain, invalid entity");
                 }
 
                 var databaseDomain = _repository.Get(i => i.Id == domain.Id).FirstOrDefault();
 
                 if (databaseDomain == null)
                 {
-                    _logger.LogInformation("Cannot update user, entity is missing");
-                    throw new ArgumentException("Cannot update user, entity is missing");
+                    _logger.LogInformation("Cannot update domain, entity is missing");
+                    throw new ArgumentException("Cannot update domain, entity is missing");
                 }
 
                 databaseDomain.DomainName = domain.DomainName;

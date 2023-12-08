@@ -4,10 +4,12 @@ using Library.BL.Services;
 using Library.DAL.DomainModel;
 using Library.DAL.Interfaces;
 using Moq;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
 namespace LibraryBLTests
 {
+    [ExcludeFromCodeCoverage]
     public class UserUnitTests
     {
         IUserService _userService;

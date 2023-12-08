@@ -4,24 +4,30 @@ using Library.BL.Services;
 using Library.DAL.DomainModel;
 using Library.DAL.Interfaces;
 using Moq;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
 namespace LibraryBLTests
 {
-    public class AuthorUnitTests
+    [ExcludeFromCodeCoverage]
+    public class AuthorServiceTests
     {
+        #region Private fields
+
         IAuthorService _authorService;
         private readonly Microsoft.Extensions.Logging.ILogger<IAuthorService> _logger;
         Mock<IAuthorRepository> _authorRepositoryMock;
         Mock<IBookAuthorService> _bookAuthorServiceMock;
 
-        #region
+        #endregion
+
+        #region Constants
 
         private int ID = 1;
 
         #endregion
 
-        public AuthorUnitTests()
+        public AuthorServiceTests()
         {
             _logger = LoggerExtensions.TestLoggingInstance<IAuthorService>();
         }

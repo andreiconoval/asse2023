@@ -1,8 +1,10 @@
 ﻿using Library.DAL.DomainModel;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Library.DAL.DataMapper
 {
+    [ExcludeFromCodeCoverage]
     public class LibraryDbContext : DbContext
     {
         public DbSet<Book> Books { get; set; }
