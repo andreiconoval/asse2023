@@ -31,15 +31,15 @@ namespace Library.BL.Services
 
                 if (!result.IsValid)
                 {
-                    _logger.LogInformation($"Cannot add new book edition, entity is invalid");
+                    _logger.LogInformation("Cannot add new book edition, entity is invalid");
                     throw new ArgumentException("Cannot add new book edition, entity is invalid");
                 }
 
-                var editionExists = _repository.Get(i => i.Edition.Trim().ToLower() == entity.Edition.Trim().ToLower()).Any();
+                var editionExists = _repository.Get(i => i.BookId == entity.BookId && i.Edition.Trim().ToLower() == entity.Edition.Trim().ToLower()).Any();
 
                 if (editionExists)
                 {
-                    _logger.LogInformation($"Cannot add new book edition, entity already exists");
+                    _logger.LogInformation("Cannot add new book edition, entity already exists");
                     throw new ArgumentException("Cannot add new book edition, entity already exists");
                 }
 
@@ -47,7 +47,7 @@ namespace Library.BL.Services
 
                 if (!bookExists)
                 {
-                    _logger.LogInformation($"Cannot add new book edition, book is missing");
+                    _logger.LogInformation("Cannot add new book edition, book is missing");
                     throw new ArgumentException("Cannot add new book edition, book is missing");
                 }
 
@@ -88,21 +88,16 @@ namespace Library.BL.Services
                     throw new ArgumentException("Cannot update book edition, entity is missing");
                 }
 
-                if(databaseBookEdition.BookId != bookEdition.BookId)
+                if (databaseBookEdition.BookId != bookEdition.BookId)
                 {
-                    var bookExists = _bookRepository.Get(i => i.Id == bookEdition.BookId).Any();
-                    if (!bookExists)
-                    {
-                        _logger.LogInformation($"Cannot add update book edition, book is missing");
-                        throw new ArgumentException("Cannot add update book edition, book is missing");
-                    }
+                    _logger.LogInformation($"Cannot add update book edition, book id was changed");
+                    throw new ArgumentException("Cannot add update book edition, book id was changed");
                 }
 
                 databaseBookEdition.Edition = bookEdition.Edition;
                 databaseBookEdition.PageNumber = bookEdition.PageNumber;
-                databaseBookEdition.BookId = bookEdition.BookId;
                 databaseBookEdition.BookType = bookEdition.BookType;
-                databaseBookEdition.ReleaseYear= bookEdition.ReleaseYear;
+                databaseBookEdition.ReleaseYear = bookEdition.ReleaseYear;
                 _repository.Update(databaseBookEdition);
                 return result;
             }
@@ -131,7 +126,7 @@ namespace Library.BL.Services
                     throw new ArgumentException("Cannot delete book edition, entity is missing");
                 }
 
-                if (fullDatabaseBook.BookSamples.Any())
+                if (fullDatabaseBook.BookSamples != null && fullDatabaseBook.BookSamples.Any())
                 {
                     _logger.LogInformation("Cannot delete book edition, entity has relations");
                     throw new ArgumentException("Cannot delete book edition, entity has relations");

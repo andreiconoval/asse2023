@@ -154,7 +154,7 @@ namespace LibraryBLTests
             SetUpGetDomain(new List<Domain>());
 
             var ex = Assert.Throws<ArgumentException>(() => _domainService.Delete(domain, false));
-            Assert.That(ex.Message, Is.EqualTo("Cannot delete user, entity is missing"));
+            Assert.That(ex.Message, Is.EqualTo("Cannot delete domain, entity is missing"));
             Assert.Pass();
         }
 

@@ -13,10 +13,10 @@ namespace Library.BL.Services
         private readonly IBookAuthorService _bookAuthorService;
 
         public BookService(
-            IBookRepository repository, 
-            ILogger logger, 
-            IBookDomainService bookDomainService, 
-            IBookAuthorService bookAuthorService) 
+            IBookRepository repository,
+            ILogger logger,
+            IBookDomainService bookDomainService,
+            IBookAuthorService bookAuthorService)
             : base(repository, new BookValidator(), logger)
         {
             _bookDomainService = bookDomainService;
@@ -81,7 +81,7 @@ namespace Library.BL.Services
                     throw new ArgumentException("Cannot update book, invalid entity");
                 }
 
-                var databaseBook= _repository.Get(i => i.Id == book.Id).FirstOrDefault();
+                var databaseBook = _repository.Get(i => i.Id == book.Id).FirstOrDefault();
                 if (databaseBook == null)
                 {
                     _logger.LogInformation("Cannot update book, entity is missing");
@@ -120,19 +120,19 @@ namespace Library.BL.Services
                     throw new ArgumentException("Cannot delete book, entity is missing");
                 }
 
-                if (!hardDelete && (fullDatabaseBook.BookDomains.Any() || fullDatabaseBook.BookDomains.Any()))
-                {
-                    _logger.LogInformation("Cannot delete book, entity has relations");
-                    throw new ArgumentException("Cannot delete book, entity has relations");
-                }
-
-                if(fullDatabaseBook.BookEditions.Any())
+                if (fullDatabaseBook.BookEditions != null && fullDatabaseBook.BookEditions.Any())
                 {
                     _logger.LogInformation("Cannot delete book with editions, mark archived instead");
                     throw new ArgumentException("Cannot delete book with editions, mark archived instead");
                 }
 
-                if (fullDatabaseBook.BookDomains.Any())
+                if (!hardDelete && (fullDatabaseBook.BookDomains != null && fullDatabaseBook.BookDomains.Any() || fullDatabaseBook.BookAuthors != null && fullDatabaseBook.BookAuthors.Any()))
+                {
+                    _logger.LogInformation("Cannot delete book, entity has relations");
+                    throw new ArgumentException("Cannot delete book, entity has relations");
+                }
+
+                if (fullDatabaseBook.BookDomains != null && fullDatabaseBook.BookDomains.Any())
                 {
                     foreach (var bookDomain in fullDatabaseBook.BookDomains)
                     {
@@ -140,7 +140,7 @@ namespace Library.BL.Services
                     }
                 }
 
-                if (fullDatabaseBook.BookAuthors.Any())
+                if (fullDatabaseBook.BookAuthors != null && fullDatabaseBook.BookAuthors.Any())
                 {
                     foreach (var bookAuthor in fullDatabaseBook.BookAuthors)
                     {
@@ -155,6 +155,11 @@ namespace Library.BL.Services
                 _logger.LogCritical(ex, "Log on error update");
                 throw;
             }
+        }
+
+        public override void Delete(Book book)
+        {
+            Delete(book, false);
         }
 
         #endregion

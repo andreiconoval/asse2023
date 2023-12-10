@@ -104,8 +104,8 @@ namespace Library.BL.Services
                 var fullDatabaseDomain = _repository.Get(i => i.Id == domain.Id, null, "BookDomains,Subdomains").FirstOrDefault();
                 if (fullDatabaseDomain == null)
                 {
-                    _logger.LogInformation("Cannot delete user, entity is missing");
-                    throw new ArgumentException("Cannot delete user, entity is missing");
+                    _logger.LogInformation("Cannot delete domain, entity is missing");
+                    throw new ArgumentException("Cannot delete domain, entity is missing");
                 }
 
                 if (!hardDelete && (fullDatabaseDomain.Subdomains.Any() || fullDatabaseDomain.BookDomains.Any()))
