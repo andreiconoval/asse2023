@@ -1,16 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Library.DAL.DomainModel
 {
-    [ExcludeFromCodeCoverage]
     public class BookLoanDetail
     {
         [Key]
         public int Id { get; set; }
 
         public int BookSampleId { get; set; }
+
+        public int? BookEditionId { get; set; }
+
+        public int? BookId { get; set; }
 
         public int ReaderLoanId { get; set; }
 

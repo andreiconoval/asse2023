@@ -12,6 +12,12 @@ namespace Library.BL.Services
         {
         }
 
+        /// <summary>
+        /// Add new user
+        /// </summary>
+        /// <param name="user">user model</param>
+        /// <returns>New user Id</returns>
+        /// <exception cref="ArgumentException"></exception>
         public int AddUser(User user)
         {
             try
@@ -43,6 +49,11 @@ namespace Library.BL.Services
             }
         }
 
+        /// <summary>
+        /// Delete user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <exception cref="ArgumentException"></exception>
         public void DeleteUser(int id)
         {
             try

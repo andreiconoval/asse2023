@@ -19,6 +19,7 @@ namespace Library.DAL.DataMapper
         public DbSet<LibraryStaff> LibraryStaff { get; set; }
         public DbSet<ReaderLoan> ReaderLoans { get; set; }
         public DbSet<BookLoanDetail> BookLoanDetails { get; set; }
+        public DbSet<LibrarySettings> LibrarySettings { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -112,7 +113,8 @@ namespace Library.DAL.DataMapper
                 .WithMany(a => a.BookDomains)
                 .HasForeignKey(ba => ba.DomainId);
 
-
+            modelBuilder.Entity<LibrarySettings>();
+               
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 foreach (var property in entityType.GetProperties())

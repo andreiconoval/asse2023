@@ -1,8 +1,7 @@
 ﻿using Library.DAL.DomainModel;
 
-namespace Library.BL.Interfaces
+namespace Library.BL.Interfaces;
+
+public interface IReaderLoanService
 {
-    interface IReaderLoanService : IService<ReaderLoan>
-    {
-    }
 }
