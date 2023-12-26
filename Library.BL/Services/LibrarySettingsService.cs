@@ -1,9 +1,6 @@
 ﻿
 using Library.DAL.DomainModel;
 using Library.DAL.Interfaces;
-using log4net.Core;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.ConstrainedExecution;
 
 namespace Library.BL.Services;
 
@@ -15,23 +12,25 @@ public class LibrarySettingsService
 
     public int DOMENII { get => LibrarySettings.MaxDomains; }
 
-    public int NMC { get => LibrarySettings.MaxBookBorrowed; }
+    public int NMC { get => LibrarySettings.MaxBookBorrowed * USER_IND; }
 
-    public int PER { get => LibrarySettings.BorrowedBooksPeriod; }
+    public int PER { get => LibrarySettings.BorrowedBooksPeriod / USER_IND; }
 
-    public int C { get => LibrarySettings.MaxBooksBorrowedPerTime; }
+    public int C { get => LibrarySettings.MaxBooksBorrowedPerTime * USER_IND; }
 
-    public int D { get => LibrarySettings.MaxAllowedBooksPerDomain; }
+    public int D { get => LibrarySettings.MaxAllowedBooksPerDomain * USER_IND; }
 
     public int L { get => LibrarySettings.AllowedMonthsForSameDomain; }
 
-    public int LIM { get => LibrarySettings.BorrowedBooksExtensionLimit; }
+    public int LIM { get => LibrarySettings.BorrowedBooksExtensionLimit * USER_IND; }
 
-    public int DELTA { get => LibrarySettings.SameBookRepeatBorrowingLimt; }
+    public int DELTA { get => LibrarySettings.SameBookRepeatBorrowingLimt / USER_IND; }
 
     public int NCZ { get => LibrarySettings.MaxBorrowedBooksPerDay; }
 
     public int PERSIMP { get => LibrarySettings.LimitBookLend; }
+
+    public int USER_IND { get; set; } = 1;
 
     public LibrarySettings LibrarySettings { get; set; }
 
@@ -49,43 +48,96 @@ public class LibrarySettingsService
 
         var loansForNewLoanDay = previousLoans.Where(pl => pl.LoanDate.Date == newLoan.LoanDate.Date).SelectMany(pl => pl.BookLoanDetails).Count();
 
-        if(staffLendCount > PERSIMP)
+        if (staffLendCount > PERSIMP)
         {
             throw new ArgumentException("Staff exceed  lend limit for today");
         }
 
-        if (user.LibraryStaff == null && 
+        if (user.LibraryStaff == null &&
             (newLoan.BookLoanDetails.Count() > NCZ || loansForNewLoanDay + newLoan.BookLoanDetails.Count() > NCZ))
         {
             throw new ArgumentException("Reader exceed limit for today");
         }
 
 
-
         return canBorrow;
     }
 
-    // Pot imprumuta un numar maxim de carti NMC intr-o perioada PER
 
-    // La un imprumut pot prelua cel mult C carti; daca numarul cartilor imprumutate la o
-    // cerere de imprumut e cel putin 3, atunci acestea trebui sa faca parte din cel putin 2
-    // categorii distincte
+    public void CheckIfUserCanBorrowBooks(User user, ReaderLoan newLoan, List<ReaderLoan> previousLoans, int staffLendCount)
+    {
+        if (user.LibraryStaff == null)
+        {
+            USER_IND = 2;
+        }
+        else
+        {
+            USER_IND = 1;
+        }
+        // Implementare pentru cerinte si limitari
 
-    // Nu pot imprumuta mai mult de D carti dintr-un acelasi domeniu – de tip frunza sau de
-    // nivel superior - in ultimele L luni
+        // Verificare limita NMC in perioada PER
+        var loansInPeriod = previousLoans.Count(pl => (DateTime.Now - pl.LoanDate).TotalDays <= PER);
+        if (loansInPeriod + 1 > NMC)
+        {
+            throw new ArgumentException("Exceeded maximum books borrowed in the specified period.");
+        }
 
-    // Pot imprumuta o carte pe o perioada determinata; se permit prelungiri, dar suma
-    // acestor prelungiri acordate in ultimele 3 luni nu poate depasi o valoare limita LIM data
+        // Verificare limita C
+        if (newLoan.BookLoanDetails.Count() > C)
+        {
+            throw new ArgumentException("Exceeded maximum books borrowed per time.");
+        }
 
-    // Nu pot imprumuta aceeasi carte de mai multe ori intr-un interval DELTA specificat, unde
-    // DELTA se masoara de la ultimul imprumut al cartii
+        // Verificare categorii distincte daca sunt cel putin 3 carti imprumutate
+        if (newLoan.BookLoanDetails.Count() >= 3)
+        {
+            var distinctCategoriesCount = newLoan.BookLoanDetails.Select(bld => bld.BookSample.BookEdition.Book.BookDomains.Select(bd => bd.DomainId)).Distinct().Count();
+            if (distinctCategoriesCount < 2)
+            {
+                throw new ArgumentException("At least 2 distinct categories are required for borrowing 3 or more books.");
+            }
+        }
 
-    // - Pot imprumuta cel mult NCZ carti intr-o zi.
+        // Verificare limita D pentru carti din acelasi domeniu in ultimele L luni
+        var currentDate = DateTime.Now;
+        var lastMonthsDate = currentDate.AddMonths(-L);
+        var recentBorrowedBooks = previousLoans.SelectMany(pl => pl.BookLoanDetails)
+                                              .Where(bld => bld.LoanDate >= lastMonthsDate && bld.LoanDate <= currentDate)
+                                              .ToList();
 
-    // Despre personalul bibliotecii:
-    // Daca sunt inregistrati drept cititori cu acelasi cont, atunci in cazul lor valorile pragurilor
-    // NMC, C, D, LIM se dubleaza, DELTA si PER se injumatatesc.
-    // - Nu pot acorda mai mult de PERSIMP carti intr-o zi; limita NCZ se ignora pentru ei.
+        var borrowedBooksFromSameDomain = recentBorrowedBooks.Count(bld => bld.BookSample.BookEdition.Book.BookDomains.Any(bd => bd.DomainId == newLoan.BookLoanDetails.First().BookSample.BookEdition.Book.BookDomains.First().DomainId));
+        if (borrowedBooksFromSameDomain + newLoan.BookLoanDetails.Count() > D)
+        {
+            throw new ArgumentException("Exceeded maximum allowed books from the same domain in the specified period.");
+        }
 
+        // Verificare limita LIM pentru prelungiri
+        var totalExtensionsInLastThreeMonths = previousLoans.Sum(pl => pl.ExtensionsGranted);
+        if (totalExtensionsInLastThreeMonths + newLoan.ExtensionsGranted > LIM)
+        {
+            throw new ArgumentException("Exceeded maximum allowed extensions for borrowed books in the last three months.");
+        }
 
+        // Verificare limita DELTA pentru aceeasi carte
+        var lastBorrowedBook = previousLoans.SelectMany(pl => pl.BookLoanDetails).OrderByDescending(bld => bld.LoanDate).FirstOrDefault();
+        if (lastBorrowedBook != null && (DateTime.Now - lastBorrowedBook.LoanDate).Days < DELTA)
+        {
+            throw new ArgumentException("Cannot borrow the same book within the specified interval.");
+        }
+
+        // Verificare limita pentru personalul bibliotecii
+        if (staffLendCount > PERSIMP)
+        {
+            throw new ArgumentException("Exceeded maximum books that library staff can lend in a day.");
+        }
+
+        var loansForNewLoanDay = previousLoans.Where(pl => pl.LoanDate.Date == newLoan.LoanDate.Date).SelectMany(pl => pl.BookLoanDetails).Count();
+
+        if (user.LibraryStaff == null &&
+            (newLoan.BookLoanDetails.Count() > NCZ || loansForNewLoanDay + newLoan.BookLoanDetails.Count() > NCZ))
+        {
+            throw new ArgumentException("Reader exceed limit for today");
+        }
+    }
 }
