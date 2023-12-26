@@ -89,6 +89,7 @@ namespace Library.BL.Services
                 }
 
                 databaseBook.Title = book.Title;
+                databaseBook.Id = book.Id;
                 databaseBook.YearPublication = book.YearPublication;
                 _repository.Update(databaseBook);
 

@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Library.BL.Validators
 {
-    [ExcludeFromCodeCoverage]
     class UserValidator : AbstractValidator<User>
     {
         public UserValidator()

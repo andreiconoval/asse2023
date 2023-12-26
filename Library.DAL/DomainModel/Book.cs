@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Library.DAL.DomainModel;
 
-[ExcludeFromCodeCoverage]
 public class Book
 {
     [Key]
@@ -16,8 +15,6 @@ public class Book
     public string Title { get; set; }
 
     public int YearPublication { get; set; }
-
-    public bool Arhived { get; set; }
 
     public virtual ICollection<BookDomain> BookDomains { get; set; }
 

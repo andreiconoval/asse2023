@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Library.DAL.DomainModel
 {
-    [ExcludeFromCodeCoverage]
     public class BookAuthor
     {
         [Key, Column(Order = 0)]

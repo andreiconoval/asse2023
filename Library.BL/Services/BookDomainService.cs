@@ -32,7 +32,8 @@ namespace Library.BL.Services
                     throw new ArgumentException("Cannot add book domain, invalid entity");
                 }
 
-                var bookDomainExists = _repository.Get(i => i.BookId == bookDomain.BookId && i.DomainId == bookDomain.DomainId).Any();
+                var bookDomains = _repository.Get(i => i.BookId == bookDomain.BookId).ToList();
+                var bookDomainExists = bookDomains.Any(i => i.DomainId == bookDomain.DomainId);
 
                 if (bookDomainExists)
                 {
@@ -41,12 +42,11 @@ namespace Library.BL.Services
                 }
 
                 var domains = _domainRepository.Get().ToList();
-                var bookDomains = _repository.Get(i => i.BookId == bookDomain.BookId).ToList();
 
                 if (IsDomainBookRelationValid(bookDomain, bookDomains, domains))
                 {
-                    _logger.LogInformation("Eroare: Relația stramos-descendent nu este validă!");
-                    throw new ArgumentException("Eroare: Relația stramos-descendent nu este validă!");
+                    _logger.LogInformation("Cannot add book domain, the ancestor-descendant relationship is not valid!");
+                    throw new ArgumentException("Cannot add book domain, the ancestor-descendant relationship is not valid!");
                 }
                 _repository.Insert(bookDomain);
 
@@ -74,28 +74,32 @@ namespace Library.BL.Services
             var domain = domains.Find(d => d.Id == newRelation.DomainId);
             if (domain == null)
             {
-                _logger.LogInformation("Eroare: Domeniul specificat nu există!");
-                throw new ArgumentException("Eroare: Domeniul specificat nu există!");
+                _logger.LogInformation("Cannot add book domain, the domain is not valid!");
+                throw new ArgumentException("Cannot add book domain, the domain is not valid!");
             }
-
-            var hasParentInRelations = true;
+            var newDomainAncestor = GetDomainAncestor(domain.Id, domains);
 
             foreach (var bookDomain in bookDomains)
             {
-                var parentDomain = domains.Find(d => d.Id == bookDomain.DomainId);
-                if (parentDomain == null)
+                if (bookDomain == null || bookDomain.Domain == null || newDomainAncestor == GetDomainAncestor(bookDomain.Domain.Id, domains))
                 {
-                    _logger.LogInformation("Eroare: Domeniul specificat in relatie nu există!");
-                    throw new ArgumentException("Eroare: Domeniul specificat in relatie nu există!");
-                }
-
-                if (parentDomain.Id == domain.DomainId || domain.Id == parentDomain.DomainId)
-                {
-                    hasParentInRelations = false;
+                    return true;
                 }
             }
 
-            return hasParentInRelations;
+            return false;
+        }
+
+        //TODO  add description
+        private int? GetDomainAncestor(int id, List<Domain> domains)
+        {
+            var ancestor = domains.FirstOrDefault(i => i.Id == id);
+            if (ancestor != null && ancestor.DomainId != null)
+            {
+                return GetDomainAncestor(ancestor.DomainId.Value, domains);
+            }
+
+            return ancestor?.Id;
         }
 
     }
