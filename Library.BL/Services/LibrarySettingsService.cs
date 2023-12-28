@@ -1,10 +1,11 @@
 ﻿
+using Library.BL.Interfaces;
 using Library.DAL.DomainModel;
 using Library.DAL.Interfaces;
 
 namespace Library.BL.Services;
 
-public class LibrarySettingsService
+public class LibrarySettingsService : ILibrarySettingsService
 {
     private readonly ILibrarySettingsRepository _librarySettingsRepository;
 
@@ -36,33 +37,11 @@ public class LibrarySettingsService
 
     #endregion Public fields
 
-    public LibrarySettingsService(ILibrarySettingsRepository _librarySettingsRepository)
+    public LibrarySettingsService(ILibrarySettingsRepository librarySettingsRepository)
     {
-        _librarySettingsRepository = _librarySettingsRepository ?? throw new ArgumentNullException();
+        _librarySettingsRepository = librarySettingsRepository ?? throw new ArgumentNullException();
         LibrarySettings = _librarySettingsRepository.Get();
     }
-
-    public bool CanBorrowBooks(User user, ReaderLoan newLoan, List<ReaderLoan> previousLoans, int staffLendCount)
-    {
-        var canBorrow = true;
-
-        var loansForNewLoanDay = previousLoans.Where(pl => pl.LoanDate.Date == newLoan.LoanDate.Date).SelectMany(pl => pl.BookLoanDetails).Count();
-
-        if (staffLendCount > PERSIMP)
-        {
-            throw new ArgumentException("Staff exceed  lend limit for today");
-        }
-
-        if (user.LibraryStaff == null &&
-            (newLoan.BookLoanDetails.Count() > NCZ || loansForNewLoanDay + newLoan.BookLoanDetails.Count() > NCZ))
-        {
-            throw new ArgumentException("Reader exceed limit for today");
-        }
-
-
-        return canBorrow;
-    }
-
 
     public void CheckIfUserCanBorrowBooks(User user, ReaderLoan newLoan, List<ReaderLoan> previousLoans, int staffLendCount)
     {

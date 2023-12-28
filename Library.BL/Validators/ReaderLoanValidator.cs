@@ -8,6 +8,7 @@ namespace Library.BL.Validators
         public ReaderLoanValidator()
         {
             RuleFor(readerLoan => readerLoan.ReaderId).NotEmpty();
+            RuleFor(readerLoan => readerLoan.StaffId).NotEmpty();
             RuleFor(readerLoan => readerLoan.LoanDate).NotEmpty().GreaterThanOrEqualTo(new DateTime(2000, 1, 15));
             RuleFor(readerLoan => readerLoan.BorrowedBooks).NotEmpty();
             RuleFor(readerLoan => readerLoan.BookLoanDetails).NotEmpty().Must((readerLoan, readerLoanDetails) => readerLoanDetails == null || readerLoanDetails.Count == readerLoan.BorrowedBooks); ;

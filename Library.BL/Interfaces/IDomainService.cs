@@ -1,9 +1,8 @@
 ﻿using Library.DAL.DomainModel;
 
-namespace Library.BL.Interfaces
+namespace Library.BL.Interfaces;
+
+public interface IDomainService : IService<Domain>
 {
-    public interface IDomainService : IService<Domain>
-    {
-        void Delete(Domain domain, bool hardDelete);
-    }
+    void Delete(Domain domain, bool hardDelete);
 }

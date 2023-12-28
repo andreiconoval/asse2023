@@ -1,8 +1,7 @@
 ﻿using Library.DAL.DomainModel;
 
-namespace Library.BL.Interfaces
+namespace Library.BL.Interfaces;
+
+public interface IBookEditionService : IService<BookEdition>
 {
-    public interface IBookEditionService : IService<BookEdition>
-    {
-    }
 }
