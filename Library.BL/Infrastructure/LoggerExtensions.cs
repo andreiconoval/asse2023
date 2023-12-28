@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Serilog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Library.BL.Infrastructure
 {
+    [ExcludeFromCodeCoverage]
     public class LoggerExtensions
     {
         public static Microsoft.Extensions.Logging.ILogger<T> LoggingInstance<T>()

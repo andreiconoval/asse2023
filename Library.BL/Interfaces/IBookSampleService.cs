@@ -2,7 +2,7 @@
 
 namespace Library.BL.Interfaces
 {
-    interface IBookSampleService : IService<BookSample>
+    public interface IBookSampleService : IService<BookSample>
     {
     }
 }

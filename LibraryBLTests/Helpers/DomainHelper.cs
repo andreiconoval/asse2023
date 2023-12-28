@@ -1,7 +1,9 @@
 ﻿using Library.DAL.DomainModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LibraryBLTests.Helpers
 {
+    [ExcludeFromCodeCoverage]
     public static class DomainHelper
     {
         public static List<Domain> GenerateDomains()

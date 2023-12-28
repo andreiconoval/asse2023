@@ -30,21 +30,24 @@ namespace Library.BL.Services
 
                 if (bookSample == null || !result.IsValid)
                 {
-                    _logger.LogInformation("Cannot add book sample, invalid entity");
                     throw new ArgumentException("Cannot add book sample, invalid entity");
                 }
 
                 var bookEditionExists = _bookEditionRepository.Get(i => i.Id == bookSample.BookEditionId).Any();
 
-                if (bookEditionExists)
+                if (!bookEditionExists)
                 {
-                    _logger.LogInformation("Cannot add book sample, book edition do not exists");
                     throw new ArgumentException("Cannot add book sample, book edition do not exists");
                 }
 
                 _repository.Insert(bookSample);
 
                 return result;
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
             }
             catch (Exception ex)
             {
@@ -62,29 +65,31 @@ namespace Library.BL.Services
 
                 if (bookSample == null || !result.IsValid)
                 {
-                    _logger.LogInformation("Cannot update book sample, invalid entity");
                     throw new ArgumentException("Cannot update book sample, invalid entity");
                 }
 
                 var bookSampleExists = _repository.Get(i => i.Id == bookSample.Id).Any();
 
-                if (bookSampleExists)
+                if (!bookSampleExists)
                 {
-                    _logger.LogInformation("Cannot update book sample, book sample do not exists");
                     throw new ArgumentException("Cannot update book sample, book sample do not exists");
                 }
 
                 var bookEditionExists = _bookEditionRepository.Get(i => i.Id == bookSample.BookEditionId).Any();
 
-                if (bookEditionExists)
+                if (!bookEditionExists)
                 {
-                    _logger.LogInformation("Cannot add book sample, book edition do not exists");
                     throw new ArgumentException("Cannot add book sample, book edition do not exists");
                 }
 
                 _repository.Update(bookSample);
 
                 return result;
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
             }
             catch (Exception ex)
             {

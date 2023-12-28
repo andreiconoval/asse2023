@@ -52,7 +52,7 @@ namespace LibraryBLTests
         [Test]
         public void AddDomain_InvalidEntity_Test()
         {
-            var ex = Assert.Throws<NullReferenceException>(() => _domainService.Insert(new Domain()));
+            var ex = Assert.Throws<ArgumentException>(() => _domainService.Insert(new Domain()));
             Assert.That(ex.Message, Is.EqualTo("Cannot add new domain, entity is invalid"));
             Assert.Pass();
         }

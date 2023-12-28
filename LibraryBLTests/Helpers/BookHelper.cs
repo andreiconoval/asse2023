@@ -1,7 +1,9 @@
 ﻿using Library.DAL.DomainModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LibraryBLTests.Helpers
 {
+    [ExcludeFromCodeCoverage]
     public static class BookHelper
     {
         static List<Book> GenerateBooks(int count)
@@ -94,155 +96,155 @@ namespace LibraryBLTests.Helpers
         }
 
         public static List<Book> Books { get; set; } = new List<Book>
-{
-    new Book
-    {
-        Id = 1,
-        Title = "The Catcher in the Rye",
-        YearPublication = 1951,
-        BookDomains = new List<BookDomain>
         {
-            new BookDomain { DomainId = 1 }, // Assign a domain ID based on your domain structure
-            new BookDomain { DomainId = 2 } // Assign another domain ID
-        },
-        BookEditions = new List<BookEdition>
-        {
-            new BookEdition
+            new Book
             {
                 Id = 1,
-                PageNumber = 224,
-                BookType = "Paperback",
-                Edition = "First Edition",
-                ReleaseYear = 1951,
-                BookSamples = new List<BookSample>
+                Title = "The Catcher in the Rye",
+                YearPublication = 1951,
+                BookDomains = new List<BookDomain>
                 {
-                    new BookSample { Id = 1, AvailableForLoan = true, AvailableForHall = true },
-                    new BookSample { Id = 2, AvailableForLoan = true, AvailableForHall = true },
-                    // Add more samples if needed
+                    new BookDomain { DomainId = 1 }, // Assign a domain ID based on your domain structure
+                    new BookDomain { DomainId = 2 } // Assign another domain ID
+                },
+                BookEditions = new List<BookEdition>
+                {
+                    new BookEdition
+                    {
+                        Id = 1,
+                        PageNumber = 224,
+                        BookType = "Paperback",
+                        Edition = "First Edition",
+                        ReleaseYear = 1951,
+                        BookSamples = new List<BookSample>
+                        {
+                            new BookSample { Id = 1, AvailableForLoan = true, AvailableForHall = true },
+                            new BookSample { Id = 2, AvailableForLoan = true, AvailableForHall = true },
+                            // Add more samples if needed
+                        }
+                    },
+                    // Add another edition if needed
                 }
             },
-            // Add another edition if needed
-        }
-    },
-    new Book
-    {
-        Id = 2,
-        Title = "To Kill a Mockingbird",
-        YearPublication = 1960,
-        BookDomains = new List<BookDomain>
-        {
-            new BookDomain { DomainId = 3 }, // Assign a domain ID based on your domain structure
-            new BookDomain { DomainId = 4 } // Assign another domain ID
-        },
-        BookEditions = new List<BookEdition>
-        {
-            new BookEdition
+            new Book
             {
                 Id = 2,
-                PageNumber = 281,
-                BookType = "Hardcover",
-                Edition = "First Edition",
-                ReleaseYear = 1960,
-                BookSamples = new List<BookSample>
+                Title = "To Kill a Mockingbird",
+                YearPublication = 1960,
+                BookDomains = new List<BookDomain>
                 {
-                    new BookSample { Id = 3, AvailableForLoan = true, AvailableForHall = true },
-                    new BookSample { Id = 4, AvailableForLoan = true, AvailableForHall = true },
-                    // Add more samples if needed
+                    new BookDomain { DomainId = 3 }, // Assign a domain ID based on your domain structure
+                    new BookDomain { DomainId = 4 } // Assign another domain ID
+                },
+                BookEditions = new List<BookEdition>
+                {
+                    new BookEdition
+                    {
+                        Id = 2,
+                        PageNumber = 281,
+                        BookType = "Hardcover",
+                        Edition = "First Edition",
+                        ReleaseYear = 1960,
+                        BookSamples = new List<BookSample>
+                        {
+                            new BookSample { Id = 3, AvailableForLoan = true, AvailableForHall = true },
+                            new BookSample { Id = 4, AvailableForLoan = true, AvailableForHall = true },
+                            // Add more samples if needed
+                        }
+                    },
+                    // Add another edition if needed
                 }
             },
-            // Add another edition if needed
-        }
-    },
-    new Book
-    {
-        Id = 3,
-        Title = "1984",
-        YearPublication = 1949,
-        BookDomains = new List<BookDomain>
-        {
-            new BookDomain { DomainId = 5 }, // Assign a domain ID based on your domain structure
-            new BookDomain { DomainId = 6 } // Assign another domain ID
-        },
-        BookEditions = new List<BookEdition>
-        {
-            new BookEdition
+            new Book
             {
                 Id = 3,
-                PageNumber = 328,
-                BookType = "Paperback",
-                Edition = "First Edition",
-                ReleaseYear = 1949,
-                BookSamples = new List<BookSample>
+                Title = "1984",
+                YearPublication = 1949,
+                BookDomains = new List<BookDomain>
                 {
-                    new BookSample { Id = 5, AvailableForLoan = true, AvailableForHall = true },
-                    new BookSample { Id = 6, AvailableForLoan = true, AvailableForHall = true },
-                    // Add more samples if needed
+                    new BookDomain { DomainId = 5 }, // Assign a domain ID based on your domain structure
+                    new BookDomain { DomainId = 6 } // Assign another domain ID
+                },
+                BookEditions = new List<BookEdition>
+                {
+                    new BookEdition
+                    {
+                        Id = 3,
+                        PageNumber = 328,
+                        BookType = "Paperback",
+                        Edition = "First Edition",
+                        ReleaseYear = 1949,
+                        BookSamples = new List<BookSample>
+                        {
+                            new BookSample { Id = 5, AvailableForLoan = true, AvailableForHall = true },
+                            new BookSample { Id = 6, AvailableForLoan = true, AvailableForHall = true },
+                            // Add more samples if needed
+                        }
+                    },
+                    // Add another edition if needed
                 }
             },
-            // Add another edition if needed
-        }
-    },
-    new Book
-    {
-        Id = 4,
-        Title = "The Great Gatsby",
-        YearPublication = 1925,
-        BookDomains = new List<BookDomain>
-        {
-            new BookDomain { DomainId = 7 }, // Assign a domain ID based on your domain structure
-            new BookDomain { DomainId = 8 } // Assign another domain ID
-        },
-        BookEditions = new List<BookEdition>
-        {
-            new BookEdition
+            new Book
             {
                 Id = 4,
-                PageNumber = 180,
-                BookType = "Hardcover",
-                Edition = "First Edition",
-                ReleaseYear = 1925,
-                BookSamples = new List<BookSample>
+                Title = "The Great Gatsby",
+                YearPublication = 1925,
+                BookDomains = new List<BookDomain>
                 {
-                    new BookSample { Id = 7, AvailableForLoan = true, AvailableForHall = true },
-                    new BookSample { Id = 8, AvailableForLoan = true, AvailableForHall = true },
-                    // Add more samples if needed
+                    new BookDomain { DomainId = 7 }, // Assign a domain ID based on your domain structure
+                    new BookDomain { DomainId = 8 } // Assign another domain ID
+                },
+                BookEditions = new List<BookEdition>
+                {
+                    new BookEdition
+                    {
+                        Id = 4,
+                        PageNumber = 180,
+                        BookType = "Hardcover",
+                        Edition = "First Edition",
+                        ReleaseYear = 1925,
+                        BookSamples = new List<BookSample>
+                        {
+                            new BookSample { Id = 7, AvailableForLoan = true, AvailableForHall = true },
+                            new BookSample { Id = 8, AvailableForLoan = true, AvailableForHall = true },
+                            // Add more samples if needed
+                        }
+                    },
+                    // Add another edition if needed
                 }
             },
-            // Add another edition if needed
-        }
-    },
-    new Book
-    {
-        Id = 5,
-        Title = "Moby-Dick",
-        YearPublication = 1851,
-        BookDomains = new List<BookDomain>
-        {
-            new BookDomain { DomainId = 9 }, // Assign a domain ID based on your domain structure
-            new BookDomain { DomainId = 10 } // Assign another domain ID
-        },
-        BookEditions = new List<BookEdition>
-        {
-            new BookEdition
+            new Book
             {
                 Id = 5,
-                PageNumber = 624,
-                BookType = "Paperback",
-                Edition = "First Edition",
-                ReleaseYear = 1851,
-                BookSamples = new List<BookSample>
+                Title = "Moby-Dick",
+                YearPublication = 1851,
+                BookDomains = new List<BookDomain>
                 {
-                    new BookSample { Id = 9, AvailableForLoan = true, AvailableForHall = true },
-                    new BookSample { Id = 10, AvailableForLoan = true, AvailableForHall = true },
-                    // Add more samples if needed
+                    new BookDomain { DomainId = 9 }, // Assign a domain ID based on your domain structure
+                    new BookDomain { DomainId = 10 } // Assign another domain ID
+                },
+                BookEditions = new List<BookEdition>
+                {
+                    new BookEdition
+                    {
+                        Id = 5,
+                        PageNumber = 624,
+                        BookType = "Paperback",
+                        Edition = "First Edition",
+                        ReleaseYear = 1851,
+                        BookSamples = new List<BookSample>
+                        {
+                            new BookSample { Id = 9, AvailableForLoan = true, AvailableForHall = true },
+                            new BookSample { Id = 10, AvailableForLoan = true, AvailableForHall = true },
+                            // Add more samples if needed
+                        }
+                    },
+                    // Add another edition if needed
                 }
-            },
-            // Add another edition if needed
-        }
-    }
-};
+            }
+        };
 
-        // Now, 'books' list contains instances of five books with assigned domains, editions, and samples.
+                // Now, 'books' list contains instances of five books with assigned domains, editions, and samples.
 
     }
 }

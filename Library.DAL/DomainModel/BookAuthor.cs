@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Library.DAL.DomainModel
 {
@@ -12,6 +11,7 @@ namespace Library.DAL.DomainModel
         [Key, Column(Order = 1)]
         public int AuthorId { get; set; }
 
+        //TODO delete
         [ForeignKey("BookId")]
         public virtual Book Book { get; set; }
 

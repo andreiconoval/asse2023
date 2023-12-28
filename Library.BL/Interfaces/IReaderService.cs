@@ -2,7 +2,7 @@
 
 namespace Library.BL.Interfaces
 {
-    interface IReaderService : IService<Reader>
+    public interface IReaderService : IService<Reader>
     {
     }
 }

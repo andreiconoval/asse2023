@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using log4net;
@@ -8,6 +9,7 @@ using Ninject;
 
 namespace Library.BL.Infrastructure
 {
+    [ExcludeFromCodeCoverage]
     public class Injector
     {
         private static IKernel _kernel;
