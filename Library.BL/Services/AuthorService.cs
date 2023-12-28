@@ -17,6 +17,12 @@ namespace Library.BL.Services
 
         #region Public
 
+        /// <summary>
+        /// Delete authors, hard delete will delete also relations with book
+        /// </summary>
+        /// <param name="id">Author Id</param>
+        /// <param name="hardDelete">Will delete author book relations</param>
+        /// <exception cref="ArgumentException"></exception>
         public void DeleteAuthor(int id, bool hardDelete)
         {
             try
@@ -56,6 +62,13 @@ namespace Library.BL.Services
             }
         }
 
+
+        /// <summary>
+        /// Method to get all author books
+        /// </summary>
+        /// <param name="id">Author id</param>
+        /// <returns>List of author book relation</returns>
+        /// <exception cref="ArgumentException"></exception>
         public IEnumerable<BookAuthor> GetAuthorBooks(int id)
         {
             var author = _repository.Get(i => i.Id == id, null, "BookAuthors").FirstOrDefault();
@@ -69,7 +82,12 @@ namespace Library.BL.Services
             return books;
         }
 
-
+        /// <summary>
+        /// Method to add new author
+        /// </summary>
+        /// <param name="author">New author</param>
+        /// <returns>author id</returns>
+        /// <exception cref="ArgumentException"></exception>
         public int AddAuthor(Author author)
         {
             try
@@ -101,6 +119,11 @@ namespace Library.BL.Services
             }
         }
 
+        /// <summary>
+        /// Method to update author
+        /// </summary>
+        /// <param name="author">Author instance</param>
+        /// <exception cref="ArgumentException"></exception>
         public void UpdateAuthor(Author author)
         {
             var result = _validator.Validate(author);

@@ -158,6 +158,10 @@ namespace Library.BL.Services
             }
         }
 
+        /// <summary>
+        /// Delete book
+        /// </summary>
+        /// <param name="book"></param>
         public override void Delete(Book book)
         {
             Delete(book, false);

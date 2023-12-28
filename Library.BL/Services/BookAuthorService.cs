@@ -18,6 +18,11 @@ namespace Library.BL.Services
             this.bookRepository = bookRepository;
         }
 
+        /// <summary>
+        /// Add new book author method
+        /// </summary>
+        /// <param name="bookAuthor">BookAuthor</param>
+        /// <exception cref="ArgumentException"></exception>
         public override ValidationResult Insert(BookAuthor bookAuthor)
         {
             try

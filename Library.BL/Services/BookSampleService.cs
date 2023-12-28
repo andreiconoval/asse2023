@@ -22,6 +22,12 @@ namespace Library.BL.Services
             _bookLoanDetailRepository = bookLoanDetailRepository;
         }
 
+        /// <summary>
+        /// Insert new book sample
+        /// </summary>
+        /// <param name="bookSample">Book sample</param>
+        /// <returns>Validation result</returns>
+        /// <exception cref="ArgumentException"></exception>
         public override ValidationResult Insert(BookSample bookSample)
         {
             try
@@ -56,7 +62,12 @@ namespace Library.BL.Services
             }
         }
 
-
+        /// <summary>
+        /// Method to update existing book sample
+        /// </summary>
+        /// <param name="bookSample">Book sample</param>
+        /// <returns>Validation result</returns>
+        /// <exception cref="ArgumentException"></exception>
         public override ValidationResult Update(BookSample bookSample)
         {
             try
@@ -98,7 +109,11 @@ namespace Library.BL.Services
             }
         }
 
-
+        /// <summary>
+        /// Deleting book sample, cannot be deleted if book sample has active bookloan
+        /// </summary>
+        /// <param name="bookSample">Book sample to delete</param>
+        /// <exception cref="ArgumentException"></exception>
         public override void Delete(BookSample bookSample)
         {
             if (bookSample is null || bookSample.Id == 0)

@@ -37,7 +37,12 @@ namespace Library.BL.Services
 
         }
 
-
+        /// <summary>
+        /// Insert new reader loan
+        /// </summary>
+        /// <param name="loan">New reader loan</param>
+        /// <returns>Reader loan with filled id</returns>
+        /// <exception cref="ArgumentException">Exceptions if something is missing or restricted</exception>
         public ReaderLoan Insert(ReaderLoan loan)
         {
             try
@@ -59,7 +64,7 @@ namespace Library.BL.Services
                 }
 
                 var staff = _userRepository.Get(u => u.Id == loan.StaffId, includeProperties: "LibraryStaff").FirstOrDefault();
-                if(staff == null || staff.LibraryStaff == null)
+                if (staff == null || staff.LibraryStaff == null)
                 {
                     _logger.LogInformation($"Cannot add new loan, staff is missing");
                     throw new ArgumentException("Cannot add new loan, staff is missing");
@@ -67,6 +72,7 @@ namespace Library.BL.Services
 
                 foreach (var bookLoanDetails in loan.BookLoanDetails)
                 {
+                    bookLoanDetails.LoanDate = DateTime.Now;
                     var resultBookLoanDetails = _bookLoanDetailValidator.Validate(bookLoanDetails);
                     if (!resultBookLoanDetails.IsValid)
                     {
@@ -88,20 +94,78 @@ namespace Library.BL.Services
 
                 var previousLoans = _readerLoanRepository.Get(u => u.ReaderId == loan.ReaderId, includeProperties: "BookLoanDetails").ToList();
 
-                // TODO: Check also day of lend
-                var staffLendCount = _readerLoanRepository.Get(s => s.StaffId == loan.StaffId, includeProperties: "BookLoanDetails").Count();
+                var dateNow = DateTime.Now.Date;
+                var staffLendCount = _readerLoanRepository.Get(s => s.StaffId == loan.StaffId && s.LoanDate.Date == dateNow, includeProperties: "BookLoanDetails").Count();
                 _librarySettingsService.CheckIfUserCanBorrowBooks(user, loan, previousLoans, staffLendCount);
 
+
+                _readerLoanRepository.Insert(loan);
+
+                foreach (var item in loan.BookLoanDetails)
+                {
+                    item.ReaderLoanId = loan.Id;
+                    _bookLoanDetailRepository.Insert(item);
+                }
+
+                return loan;
             }
             catch (Exception)
             {
-
                 throw;
             }
 
-            return loan;
+
         }
 
+        /// <summary>
+        /// Mark reader loan as returned for all book
+        /// </summary>
+        /// <param name="readerLoanId"> Reader loan id</param>
+        /// <exception cref="ArgumentException"> Exception if book loan is missing </exception>
+        public void Delete(int readerLoanId)
+        {
+            var readerLoan = _readerLoanRepository.Get(u => u.Id == readerLoanId, includeProperties: "BookLoanDetails").FirstOrDefault();
+            if (readerLoan == null)
+            {
+                _logger.LogInformation($"Cannot delete book loan, book loan is invalid");
+                throw new ArgumentException("Cannot delete book loan, book loan is invalid");
+            }
 
+            foreach (var item in readerLoan.BookLoanDetails)
+            {
+                item.EffectiveReturnDate ??= DateTime.Now;
+                _bookLoanDetailRepository.Update(item);
+            }
+        }
+
+        /// <summary>
+        /// Extend Book loan details period from Now
+        /// </summary>
+        /// <param name="bookLoanDetailId"> Book loan detail id</param>
+        /// <exception cref="ArgumentException">Extensions limit and missing entity exception</exception>
+        public void SetExtensionsForLoan(int bookLoanDetailId)
+        {
+            var bookLoanDetail = _bookLoanDetailRepository.Get(bld => bld.Id == bookLoanDetailId, includeProperties: "ReaderLoan").FirstOrDefault();
+            if (bookLoanDetail == null)
+            {
+                _logger.LogInformation($"Cannot update book loan detail, book loan is invalid");
+                throw new ArgumentException("Cannot update book loan detail, book loan is invalid");
+            }
+
+            var previousLoans = _readerLoanRepository.Get(u => u.ReaderId == bookLoanDetail.ReaderLoan.ReaderId, includeProperties: "BookLoanDetails").ToList();
+
+            // Verificare limita LIM pentru prelungiri
+            var totalExtensionsInLastThreeMonths = previousLoans.Sum(pl => pl.ExtensionsGranted);
+            if (totalExtensionsInLastThreeMonths + 1 > _librarySettingsService.LIM)
+            {
+                throw new ArgumentException("Exceeded maximum allowed extensions for borrowed books in the last three months.");
+            }
+
+            bookLoanDetail.ExpectedReturnDate = DateTime.Now;
+            bookLoanDetail.ReaderLoan.ExtensionsGranted += 1;
+
+            _bookLoanDetailRepository.Update(bookLoanDetail);
+            _readerLoanRepository.Update(bookLoanDetail.ReaderLoan);
+        }
     }
 }

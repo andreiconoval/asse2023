@@ -43,6 +43,14 @@ public class LibrarySettingsService : ILibrarySettingsService
         LibrarySettings = _librarySettingsRepository.Get();
     }
 
+    /// <summary>
+    /// Check base on library settings is user can borrow books or not
+    /// </summary>
+    /// <param name="user">User that with borrow</param>
+    /// <param name="newLoan">New redear loan</param>
+    /// <param name="previousLoans">Previous user loans</param>
+    /// <param name="staffLendCount">Staff lend count for today</param>
+    /// <exception cref="ArgumentException"></exception>
     public void CheckIfUserCanBorrowBooks(User user, ReaderLoan newLoan, List<ReaderLoan> previousLoans, int staffLendCount)
     {
         if (user.LibraryStaff == null)
@@ -89,13 +97,6 @@ public class LibrarySettingsService : ILibrarySettingsService
         if (borrowedBooksFromSameDomain + newLoan.BookLoanDetails.Count() > D)
         {
             throw new ArgumentException("Exceeded maximum allowed books from the same domain in the specified period.");
-        }
-
-        // Verificare limita LIM pentru prelungiri
-        var totalExtensionsInLastThreeMonths = previousLoans.Sum(pl => pl.ExtensionsGranted);
-        if (totalExtensionsInLastThreeMonths + newLoan.ExtensionsGranted > LIM)
-        {
-            throw new ArgumentException("Exceeded maximum allowed extensions for borrowed books in the last three months.");
         }
 
         // Verificare limita DELTA pentru aceeasi carte

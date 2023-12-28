@@ -20,6 +20,12 @@ namespace Library.BL.Services
             _domainRepository = domainRepository;
         }
 
+        /// <summary>
+        /// Insert new bookd domain
+        /// </summary>
+        /// <param name="bookDomain">Book domain relation</param>
+        /// <returns>Validation result</returns>
+        /// <exception cref="ArgumentException"></exception>
         public override ValidationResult Insert(BookDomain bookDomain)
         {
             try
@@ -90,7 +96,12 @@ namespace Library.BL.Services
             return false;
         }
 
-        //TODO  add description
+        /// <summary>
+        /// Method to find domains ancestors
+        /// </summary>
+        /// <param name="id">Domains id</param>
+        /// <param name="domains">List of domains to search</param>
+        /// <returns>Ancestor domain id</returns>
         private int? GetDomainAncestor(int id, List<Domain> domains)
         {
             var ancestor = domains.FirstOrDefault(i => i.Id == id);
@@ -101,6 +112,5 @@ namespace Library.BL.Services
 
             return ancestor?.Id;
         }
-
     }
 }
