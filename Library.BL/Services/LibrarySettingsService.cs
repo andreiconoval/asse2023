@@ -79,7 +79,7 @@ public class LibrarySettingsService : ILibrarySettingsService
         // Verificare categorii distincte daca sunt cel putin 3 carti imprumutate
         if (newLoan.BookLoanDetails.Count() >= 3)
         {
-            var distinctCategoriesCount = newLoan.BookLoanDetails.Select(bld => bld.BookSample.BookEdition.Book.BookDomains.Select(bd => bd.DomainId)).Distinct().Count();
+            var distinctCategoriesCount = newLoan.BookLoanDetails.SelectMany(bld => bld.BookSample.BookEdition.Book.BookDomains.Select(bd => bd.DomainId)).Distinct().Count();
             if (distinctCategoriesCount < 2)
             {
                 throw new ArgumentException("At least 2 distinct categories are required for borrowing 3 or more books.");

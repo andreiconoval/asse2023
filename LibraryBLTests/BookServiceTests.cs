@@ -199,6 +199,16 @@ namespace LibraryBLTests
             Assert.Pass();
         }
 
+        [Test]
+        public void Delete_NoLinkedEntities_Success_Test()
+        {
+            SetUpGetBook(new List<Book>() { NewBook });
+
+            _service.Delete(NewBook);
+            _bookRepositoryMock.Verify(x => x.Delete(It.IsAny<Book>()), Times.Once);
+            Assert.Pass();
+        }
+
         private void SetUpGetBook(List<Book> books)
         {
             _bookRepositoryMock.Setup(i => i.Get(It.IsAny<Expression<Func<Book, bool>>>(), It.IsAny<Func<IQueryable<Book>, IOrderedQueryable<Book>>>(), It.IsAny<string>())).Returns(books);
