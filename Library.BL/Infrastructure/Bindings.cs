@@ -1,31 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Library.BL.Interfaces;
-using Library.BL.Services;
-using Library.DAL.DomainModel;
-using Library.DAL.Interfaces;
-using Library.DAL.Repositories;
-using log4net.Core;
-using Microsoft.Extensions.Logging;
-using Ninject.Modules;
+﻿//------------------------------------------------------------------------------
+// <copyright file="Bindings.cs" company="Your Company">
+// Copyright (c) Your Company. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 namespace Library.BL.Infrastructure
 {
+    using System.Diagnostics.CodeAnalysis;
+    using Library.BL.Interfaces;
+    using Library.BL.Services;
+    using Library.DAL.Interfaces;
+    using Library.DAL.Repositories;
+    using Ninject.Modules;
+
+    /// <summary>
+    /// Bindings class.
+    /// </summary>
     [ExcludeFromCodeCoverage]
-    class Bindings: NinjectModule
+    internal class Bindings : NinjectModule
     {
+        /// <summary>
+        /// Load method.
+        /// </summary>
         public override void Load()
         {
-            // Here I should have a switch to change impl (Mocks / Real)
-
-            LoadRepositoryLayer();
-            LoadServicesLayer();
+            this.LoadRepositoryLayer();
+            this.LoadServicesLayer();
         }
 
+        /// <summary>
+        /// Load service layer.
+        /// </summary>
         private void LoadServicesLayer()
         {
             Bind<IAuthorService>().To<AuthorService>();
@@ -34,6 +40,9 @@ namespace Library.BL.Infrastructure
             Bind<IBookEditionService>().To<BookEditionService>();
         }
 
+        /// <summary>
+        /// Load repository layer.
+        /// </summary>
         private void LoadRepositoryLayer()
         {
             Bind<IAuthorRepository>().To<AuthorRepository>();

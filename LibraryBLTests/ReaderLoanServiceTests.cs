@@ -67,7 +67,7 @@ namespace LibraryBLTests
             MaxBooksBorrowedPerTime = 3,
             MaxBorrowedBooksPerDay = 7,
             MaxDomains = 5,
-            SameBookRepeatBorrowingLimt = 2,
+            SameBookRepeatBorrowingLimit = 2,
         };
 
 

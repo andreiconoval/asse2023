@@ -1,30 +1,57 @@
-﻿using FluentValidation;
-using FluentValidation.Results;
-using Library.BL.Interfaces;
-using Library.DAL.Interfaces;
-using Microsoft.Extensions.Logging;
+﻿//------------------------------------------------------------------------------
+// <copyright file="BaseService.cs" company="Transilvania University of Brasov">
+// Copyright (c) Conoval. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 namespace Library.BL.Services
 {
+    using System;
+    using System.Collections.Generic;
+    using FluentValidation;
+    using FluentValidation.Results;
+    using Library.BL.Interfaces;
+    using Library.DAL.Interfaces;
+    using Microsoft.Extensions.Logging;
+
+    /// <summary>
+    /// Abstract base service providing common CRUD operations.
+    /// </summary>
+    /// <typeparam name="T">The type of entity.</typeparam>
+    /// <typeparam name="U">The type of repository for the entity.</typeparam>
     public abstract class BaseService<T, U> : IService<T>
          where T : class
          where U : IRepository<T>
     {
-        protected U _repository;
-        protected IValidator<T> _validator;
-        protected ILogger _logger;
-
         /// <summary>
-        /// Ctor for base service
+        /// Initializes a new instance of the <see cref="BaseService{T,U}" /> class.
+        /// Constructor for the BaseService class.
         /// </summary>
-        /// <param name="repository">The actual repository that will fit into this class</param>
-        /// <param name="validator">The fluent validation validator</param>
+        /// <param name="repository">The actual repository that will fit into this class.</param>
+        /// <param name="validator">The Fluent Validation validator.</param>
+        /// <param name="logger">The Logger.</param>
         public BaseService(U repository, IValidator<T> validator, ILogger logger)
         {
-            _repository = repository;
-            _validator = validator;
-            _logger = logger;
+            this.Repository = repository;
+            this.Validator = validator;
+            this.Logger = logger;
         }
+
+        /// <summary>
+        /// Gets or sets the actual repository that will fit into this class.
+        /// </summary>
+        internal U Repository { get; set; }
+
+        /// <summary>
+        /// Gets or sets the validator instance.
+        /// </summary>
+        internal IValidator<T> Validator { get; set; }
+
+        /// <summary>
+        /// Gets or sets the logger instance.
+        /// </summary>
+        internal ILogger Logger { get; set; }
 
         /// <summary>Inserts the specified entity.</summary>
         /// <param name="entity">The entity.</param>
@@ -35,33 +62,33 @@ namespace Library.BL.Services
         {
             try
             {
-                var result = _validator.Validate(entity);
+                var result = this.Validator.Validate(entity);
                 if (result.IsValid)
                 {
-                    _repository.Insert(entity);
-                    _logger.LogInformation($"Add new {nameof(T)}");
+                    this.Repository.Insert(entity);
+                    this.Logger.LogInformation($"Add new {nameof(T)}");
                 }
                 else
                 {
-                    _logger.LogInformation($"Cannot add new {nameof(T)}, entity is invalid");
+                    this.Logger.LogInformation($"Cannot add new {nameof(T)}, entity is invalid");
                 }
 
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.LogCritical(ex, "Log on error add");
+                this.Logger.LogCritical(ex, "Log on error add");
                 throw;
             }
-
         }
 
+        /// <inheritdoc/>
         public virtual ValidationResult Update(T entity)
         {
-            var result = _validator.Validate(entity);
+            var result = this.Validator.Validate(entity);
             if (result.IsValid)
             {
-                _repository.Update(entity);
+                this.Repository.Update(entity);
             }
 
             return result;
@@ -71,17 +98,17 @@ namespace Library.BL.Services
         /// <param name="entity">The entity to be deleted.</param>
         public virtual void Delete(T entity)
         {
-            _repository.Delete(entity);
+            this.Repository.Delete(entity);
         }
 
         /// <summary>
         /// Get entity based on Id
         /// </summary>
         /// <param name="id"> Id of entity</param>
-        /// <returns></returns>
+        /// <returns>T entity</returns>
         public virtual T GetByID(object id)
         {
-            return _repository.GetByID(id);
+            return this.Repository.GetByID(id);
         }
 
         /// <summary>
@@ -90,7 +117,7 @@ namespace Library.BL.Services
         /// <returns>Return list of entities</returns>
         public virtual IEnumerable<T> GetAll()
         {
-            return _repository.Get();
+            return this.Repository.Get();
         }
     }
 }

@@ -1,40 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
-using log4net;
-using Microsoft.Extensions.Logging;
-using Ninject;
+﻿//------------------------------------------------------------------------------
+// <copyright file="Injector.cs" company="Transilvania University of Brasov">
+// Copyright (c) Conoval. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 namespace Library.BL.Infrastructure
 {
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Reflection;
+    using Ninject;
+
+    /// <summary>
+    /// Defines the <see cref="Injector" />.
+    /// </summary>
     [ExcludeFromCodeCoverage]
     public class Injector
     {
-        private static IKernel _kernel;
+        /// <summary>
+        /// Defines the _kernel.
+        /// </summary>
+        private static IKernel? kernel;
+
+        /// <summary>
+        /// Gets the Kernel.
+        /// </summary>
         public static IKernel Kernel
         {
             get
             {
-                if (_kernel == null)
+                if (kernel == null)
                 {
                     throw new ArgumentNullException("Injection method should be called first!");
                 }
 
-                return _kernel;
+                return kernel;
             }
         }
 
+        /// <summary>
+        /// The Inject.
+        /// </summary>
         public static void Inject()
         {
-            _kernel = new StandardKernel(new Bindings());
-            _kernel.Load(Assembly.GetExecutingAssembly());
+            kernel = new StandardKernel(new Bindings());
+            kernel.Load(Assembly.GetExecutingAssembly());
         }
 
+        /// <summary>
+        /// The Get.
+        /// </summary>
+        /// <typeparam name="T">Generic T class.</typeparam>
+        /// <returns>The generic <see cref="T"/>.</returns>
         public static T Get<T>()
         {
-            return _kernel.Get<T>();
+            return kernel.Get<T>();
         }
     }
 }

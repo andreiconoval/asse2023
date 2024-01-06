@@ -1,35 +1,103 @@
-﻿using Library.DAL.DomainModel;
-using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.CodeAnalysis;
+﻿//------------------------------------------------------------------------------
+// <copyright file="LibraryDbContext.cs" company="Transilvania University of Brasov">
+// Copyright (c) Conoval. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 namespace Library.DAL.DataMapper
 {
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using Library.DAL.DomainModel;
+    using Microsoft.EntityFrameworkCore;
+
+    /// <summary>
+    /// Defines the <see cref="LibraryDbContext" />.
+    /// </summary>
     [ExcludeFromCodeCoverage]
     public class LibraryDbContext : DbContext
     {
-        public DbSet<Book> Books { get; set; }
-        public DbSet<Domain> Domains { get; set; }
-        public DbSet<BookDomain> BooksDomains { get; set; }
-        public DbSet<Author> Authors { get; set; }
-        public DbSet<BookAuthor> BooksAuthors { get; set; }
-        public DbSet<BookEdition> BookEditions { get; set; }
-        public DbSet<BookSample> BookSamples { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Reader> Readers { get; set; }
-        public DbSet<LibraryStaff> LibraryStaff { get; set; }
-        public DbSet<ReaderLoan> ReaderLoans { get; set; }
-        public DbSet<BookLoanDetail> BookLoanDetails { get; set; }
-        public DbSet<LibrarySettings> LibrarySettings { get; set; }
+        /// <summary>
+        /// Gets or sets the Books.
+        /// </summary>
+        public DbSet<Book>? Books { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Domains.
+        /// </summary>
+        public DbSet<Domain>? Domains { get; set; }
 
+        /// <summary>
+        /// Gets or sets the BooksDomains.
+        /// </summary>
+        public DbSet<BookDomain>? BooksDomains { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Authors.
+        /// </summary>
+        public DbSet<Author>? Authors { get; set; }
+
+        /// <summary>
+        /// Gets or sets the BooksAuthors.
+        /// </summary>
+        public DbSet<BookAuthor>? BooksAuthors { get; set; }
+
+        /// <summary>
+        /// Gets or sets the BookEditions.
+        /// </summary>
+        public DbSet<BookEdition>? BookEditions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the BookSamples.
+        /// </summary>
+        public DbSet<BookSample>? BookSamples { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Users.
+        /// </summary>
+        public DbSet<User>? Users { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Readers.
+        /// </summary>
+        public DbSet<Reader>? Readers { get; set; }
+
+        /// <summary>
+        /// Gets or sets the LibraryStaff.
+        /// </summary>
+        public DbSet<LibraryStaff>? LibraryStaff { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ReaderLoans.
+        /// </summary>
+        public DbSet<ReaderLoan>? ReaderLoans { get; set; }
+
+        /// <summary>
+        /// Gets or sets the BookLoanDetails.
+        /// </summary>
+        public DbSet<BookLoanDetail>? BookLoanDetails { get; set; }
+
+        /// <summary>
+        /// Gets or sets the LibrarySettings.
+        /// </summary>
+        public DbSet<LibrarySettings>? LibrarySettings { get; set; }
+
+        /// <summary>
+        /// The OnConfiguring.
+        /// </summary>
+        /// <param name="optionsBuilder">The optionsBuilder<see cref="DbContextOptionsBuilder"/>.</param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseMySQL("server=localhost;database=asse_library;user=root;password=mysqladmin");
         }
 
+        /// <summary>
+        /// The OnModelCreating.
+        /// </summary>
+        /// <param name="modelBuilder">The modelBuilder<see cref="ModelBuilder"/>.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.Entity<Book>()
                 .HasMany(b => b.BookDomains)
                 .WithOne()
@@ -39,7 +107,7 @@ namespace Library.DAL.DataMapper
                 .HasMany(d => d.BookDomains)
                 .WithOne()
                 .HasForeignKey(bd => bd.DomainId);
-           
+
             modelBuilder.Entity<Domain>()
                .HasMany(d => d.Subdomains)
                .WithOne()
@@ -99,7 +167,6 @@ namespace Library.DAL.DataMapper
                 .WithMany(a => a.BookAuthors)
                 .HasForeignKey(ba => ba.AuthorId);
 
-
             modelBuilder.Entity<BookDomain>()
             .HasKey(ba => new { ba.BookId, ba.DomainId });
 
@@ -114,7 +181,7 @@ namespace Library.DAL.DataMapper
                 .HasForeignKey(ba => ba.DomainId);
 
             modelBuilder.Entity<LibrarySettings>();
-               
+
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 foreach (var property in entityType.GetProperties())
@@ -125,6 +192,11 @@ namespace Library.DAL.DataMapper
             }
         }
 
+        /// <summary>
+        /// The ConvertPropertyNameToColumnName.
+        /// </summary>
+        /// <param name="propertyName">The propertyName<see cref="string"/>.</param>
+        /// <returns>The <see cref="string"/>.</returns>
         private static string ConvertPropertyNameToColumnName(string propertyName)
         {
             // Implement your naming convention logic here

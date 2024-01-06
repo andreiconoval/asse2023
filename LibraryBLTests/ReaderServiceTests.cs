@@ -4,7 +4,10 @@ using Library.BL.Services;
 using Library.DAL.DomainModel;
 using Library.DAL.Interfaces;
 using Moq;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace LibraryBLTests
@@ -77,7 +80,7 @@ namespace LibraryBLTests
         [Test]
         public void GetAll_Test()
         {
-            SetUpGetReader(new List<Reader>() { new Reader()});
+            SetUpGetReader(new List<Reader>() { new Reader() });
 
             var result = _service.GetAll();
             Assert.That(result, Is.Not.Null);

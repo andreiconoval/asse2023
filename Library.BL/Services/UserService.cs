@@ -1,59 +1,74 @@
-﻿using Library.BL.Interfaces;
-using Library.BL.Validators;
-using Library.DAL.DomainModel;
-using Library.DAL.Interfaces;
-using Microsoft.Extensions.Logging;
+﻿//------------------------------------------------------------------------------
+// <copyright file="UserService.cs" company="Transilvania University of Brasov">
+// Copyright (c) Conoval. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 namespace Library.BL.Services
 {
+    using System;
+    using System.Linq;
+    using Library.BL.Interfaces;
+    using Library.BL.Validators;
+    using Library.DAL.DomainModel;
+    using Library.DAL.Interfaces;
+    using Microsoft.Extensions.Logging;
+
+    /// <summary>
+    /// Defines the <see cref="UserService" />.
+    /// </summary>
     public class UserService : BaseService<User, IUserRepository>, IUserService
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserService"/> class.
+        /// </summary>
+        /// <param name="repository">The repository<see cref="IUserRepository"/>.</param>
+        /// <param name="logger">The logger<see cref="ILogger{IUserService}"/>.</param>
         public UserService(IUserRepository repository, ILogger<IUserService> logger) : base(repository, new UserValidator(), logger)
         {
         }
 
         /// <summary>
-        /// Add new user
+        /// Add new user.
         /// </summary>
-        /// <param name="user">user model</param>
-        /// <returns>New user Id</returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name="user">user model.</param>
+        /// <returns>New user Id.</returns>
         public int AddUser(User user)
         {
             try
             {
-                var result = _validator.Validate(user);
+                var result = Validator.Validate(user);
 
                 if (user == null || !result.IsValid)
                 {
-                    _logger.LogInformation("Cannot add user, invalid entity");
+                    Logger.LogInformation("Cannot add user, invalid entity");
                     throw new ArgumentException("Cannot add user, invalid entity");
                 }
 
-                var authorExists = _repository.Get(i => i.Email.Trim() == user.Email.Trim()).Any();
+                var authorExists = Repository.Get(i => i.Email.Trim() == user.Email.Trim()).Any();
 
                 if (authorExists)
                 {
-                    _logger.LogInformation("Cannot add user, user already exists");
+                    Logger.LogInformation("Cannot add user, user already exists");
                     throw new ArgumentException("Cannot add user, user already exists");
                 }
 
-                _repository.Insert(user);
+                Repository.Insert(user);
 
                 return user.Id;
             }
             catch (Exception ex)
             {
-                _logger.LogCritical(ex.Message);
+                Logger.LogCritical(ex.Message);
                 throw;
             }
         }
 
         /// <summary>
-        /// Delete user
+        /// Delete user.
         /// </summary>
-        /// <param name="id"></param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name="id">Entity id.</param>
         public void DeleteUser(int id)
         {
             try
@@ -61,42 +76,41 @@ namespace Library.BL.Services
                 var user = GetByID(id);
                 if (user == null)
                 {
-                    _logger.LogInformation($"Cannot delete user with id: {id}, id is invalid");
+                    Logger.LogInformation($"Cannot delete user with id: {id}, id is invalid");
                     throw new ArgumentException($"Cannot delete user with id: {id}, id is invalid");
                 }
 
-                base.Delete(user);
+                this.Delete(user);
             }
             catch (Exception ex)
             {
-                _logger.LogCritical(ex.Message);
+                Logger.LogCritical(ex.Message);
                 throw;
             }
         }
 
         /// <summary>
         /// Update user based on email or id
-        /// Email and Id are not updated
+        /// Email and Id are not updated.
         /// </summary>
-        /// <param name="user">User entity</param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name="user">User entity.</param>
         public void UpdateUser(User user)
         {
-            var result = _validator.Validate(user);
+            var result = Validator.Validate(user);
 
             if (user == null || user.Id == 0 || !result.IsValid)
             {
-                _logger.LogInformation("Cannot update user, invalid entity");
+                Logger.LogInformation("Cannot update user, invalid entity");
                 throw new ArgumentException("Cannot update user, invalid entity");
             }
 
-            var databaseAuthor = _repository
-                .Get(i => i.Id == user.Id || i.Email.Trim().ToLower() == user.Email.Trim().ToLower())
+            var databaseAuthor = Repository
+                .Get(i => i.Id == user.Id || (i.Email != null && user.Email != null && i.Email.Trim().ToLower() == user.Email.Trim().ToLower()))
                 .FirstOrDefault();
 
             if (databaseAuthor == null)
             {
-                _logger.LogInformation("Cannot update user, entity is missing");
+                Logger.LogInformation("Cannot update user, entity is missing");
                 throw new ArgumentException("Cannot update user, entity is missing");
             }
 
@@ -105,7 +119,7 @@ namespace Library.BL.Services
             databaseAuthor.Phone = user.Phone;
             databaseAuthor.Address = user.Address;
 
-            _repository.Update(databaseAuthor);
+            Repository.Update(databaseAuthor);
         }
     }
 }

@@ -1,17 +1,43 @@
-﻿using FluentValidation.Results;
-using Library.BL.Interfaces;
-using Library.BL.Validators;
-using Library.DAL.DomainModel;
-using Library.DAL.Interfaces;
-using Microsoft.Extensions.Logging;
+﻿//------------------------------------------------------------------------------
+// <copyright file="BookService.cs" company="Transilvania University of Brasov">
+// Copyright (c) Conoval. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 namespace Library.BL.Services
 {
+    using System;
+    using System.Linq;
+    using FluentValidation.Results;
+    using Library.BL.Interfaces;
+    using Library.BL.Validators;
+    using Library.DAL.DomainModel;
+    using Library.DAL.Interfaces;
+    using Microsoft.Extensions.Logging;
+
+    /// <summary>
+    /// Book service.
+    /// </summary>
     public class BookService : BaseService<Book, IBookRepository>, IBookService
     {
-        private readonly IBookDomainService _bookDomainService;
-        private readonly IBookAuthorService _bookAuthorService;
+        /// <summary>
+        /// Defines the bookDomainService.
+        /// </summary>
+        private readonly IBookDomainService bookDomainService;
 
+        /// <summary>
+        /// Defines the bookAuthorService.
+        /// </summary>
+        private readonly IBookAuthorService bookAuthorService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BookService"/> class.
+        /// </summary>
+        /// <param name="repository">Book repository.</param>
+        /// <param name="logger">Logger object.</param>
+        /// <param name="bookDomainService">Book domain Service.</param>
+        /// <param name="bookAuthorService">Book author service.</param>
         public BookService(
             IBookRepository repository,
             ILogger logger,
@@ -19,85 +45,80 @@ namespace Library.BL.Services
             IBookAuthorService bookAuthorService)
             : base(repository, new BookValidator(), logger)
         {
-            _bookDomainService = bookDomainService;
-            _bookAuthorService = bookAuthorService;
+            this.bookDomainService = bookDomainService;
+            this.bookAuthorService = bookAuthorService;
         }
 
-        #region Public
-
         /// <summary>
-        /// Add new book
+        /// Add new book.
         /// </summary>
-        /// <param name="entity">Book entity</param>
-        /// <returns>Validation result, Filled entity id with new one</returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name="entity">Book entity.</param>
+        /// <returns>Validation result, Filled entity id with new one.</returns>
         public override ValidationResult Insert(Book entity)
         {
             try
             {
-                var result = _validator.Validate(entity);
+                var result = Validator.Validate(entity);
 
                 if (!result.IsValid)
                 {
-                    _logger.LogInformation($"Cannot add new book, entity is invalid");
+                    Logger.LogInformation($"Cannot add new book, entity is invalid");
                     throw new ArgumentException("Cannot add new book, entity is invalid");
                 }
 
-                var bookExists = _repository.Get(i => i.Title.Trim().ToLower() == entity.Title.Trim().ToLower()).Any();
+                var bookExists = Repository.Get(i => entity.Title != null && i.Title != null && i.Title.Trim().ToLower() == entity.Title.Trim().ToLower()).Any();
 
                 if (bookExists)
                 {
-                    _logger.LogInformation($"Cannot add new book, entity already exists");
+                    Logger.LogInformation($"Cannot add new book, entity already exists");
                     throw new ArgumentException("Cannot add new book, entity already exists");
                 }
 
-                _repository.Insert(entity);
-                _logger.LogInformation($"Add new book");
+                Repository.Insert(entity);
+                Logger.LogInformation($"Add new book");
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.LogCritical(ex, "Log on error add");
+                Logger.LogCritical(ex, "Log on error add");
                 throw;
             }
         }
 
-
         /// <summary>
-        /// Update book based on id
+        /// Update book based on id.
         /// </summary>
-        /// <param name="book">Book entity</param>
-        /// <returns>Validation result for entity</returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name="book">Book entity.</param>
+        /// <returns>Validation result for entity.</returns>
         public override ValidationResult Update(Book book)
         {
             try
             {
-                var result = _validator.Validate(book);
+                var result = Validator.Validate(book);
 
                 if (!result.IsValid)
                 {
-                    _logger.LogInformation("Cannot update book, invalid entity");
+                    Logger.LogInformation("Cannot update book, invalid entity");
                     throw new ArgumentException("Cannot update book, invalid entity");
                 }
 
-                var databaseBook = _repository.Get(i => i.Id == book.Id).FirstOrDefault();
+                var databaseBook = Repository.Get(i => i.Id == book.Id).FirstOrDefault();
                 if (databaseBook == null)
                 {
-                    _logger.LogInformation("Cannot update book, entity is missing");
+                    Logger.LogInformation("Cannot update book, entity is missing");
                     throw new ArgumentException("Cannot update book, entity is missing");
                 }
 
                 databaseBook.Title = book.Title;
                 databaseBook.Id = book.Id;
                 databaseBook.YearPublication = book.YearPublication;
-                _repository.Update(databaseBook);
+                Repository.Update(databaseBook);
 
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.LogCritical(ex, "Log on error update");
+                Logger.LogCritical(ex, "Log on error update");
                 throw;
             }
         }
@@ -105,31 +126,30 @@ namespace Library.BL.Services
         /// <summary>
         /// Delete book from database based on Id.
         /// Hard delete will remove also all Book Domains and BookAuthor relations with hard delete flag,
-        /// But will throw error if book have editions, instead of this mark book archived
+        /// But will throw error if book have editions, instead of this mark book archived.
         /// </summary>
-        /// <param name="book">Book to delete by Id</param>
-        /// <param name="hardDelete"> Flag that indicate to remove  book full</param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name="book">Book to delete by Id.</param>
+        /// <param name="hardDelete"> Flag that indicate to remove  book full.</param>
         public void Delete(Book book, bool hardDelete)
         {
             try
             {
-                var fullDatabaseBook = _repository.Get(i => i.Id == book.Id, null, "BookDomains,BookAuthors,BookEditions").FirstOrDefault();
+                var fullDatabaseBook = Repository.Get(i => i.Id == book.Id, null, "BookDomains,BookAuthors,BookEditions").FirstOrDefault();
                 if (fullDatabaseBook == null)
                 {
-                    _logger.LogInformation("Cannot delete book, entity is missing");
+                    Logger.LogInformation("Cannot delete book, entity is missing");
                     throw new ArgumentException("Cannot delete book, entity is missing");
                 }
 
                 if (fullDatabaseBook.BookEditions != null && fullDatabaseBook.BookEditions.Any())
                 {
-                    _logger.LogInformation("Cannot delete book with editions, mark archived instead");
+                    Logger.LogInformation("Cannot delete book with editions, mark archived instead");
                     throw new ArgumentException("Cannot delete book with editions, mark archived instead");
                 }
 
-                if (!hardDelete && (fullDatabaseBook.BookDomains != null && fullDatabaseBook.BookDomains.Any() || fullDatabaseBook.BookAuthors != null && fullDatabaseBook.BookAuthors.Any()))
+                if (!hardDelete && ((fullDatabaseBook.BookDomains != null && fullDatabaseBook.BookDomains.Any()) || (fullDatabaseBook.BookAuthors != null && fullDatabaseBook.BookAuthors.Any())))
                 {
-                    _logger.LogInformation("Cannot delete book, entity has relations");
+                    Logger.LogInformation("Cannot delete book, entity has relations");
                     throw new ArgumentException("Cannot delete book, entity has relations");
                 }
 
@@ -137,7 +157,7 @@ namespace Library.BL.Services
                 {
                     foreach (var bookDomain in fullDatabaseBook.BookDomains)
                     {
-                        _bookDomainService.Delete(bookDomain);
+                        this.bookDomainService.Delete(bookDomain);
                     }
                 }
 
@@ -145,7 +165,7 @@ namespace Library.BL.Services
                 {
                     foreach (var bookAuthor in fullDatabaseBook.BookAuthors)
                     {
-                        _bookAuthorService.Delete(bookAuthor);
+                        this.bookAuthorService.Delete(bookAuthor);
                     }
                 }
 
@@ -153,20 +173,18 @@ namespace Library.BL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogCritical(ex, "Log on error update");
+                Logger.LogCritical(ex, "Log on error update");
                 throw;
             }
         }
 
         /// <summary>
-        /// Delete book
+        /// Delete book.
         /// </summary>
-        /// <param name="book"></param>
+        /// <param name="book">Book entity.</param>
         public override void Delete(Book book)
         {
-            Delete(book, false);
+            this.Delete(book, false);
         }
-
-        #endregion
     }
 }

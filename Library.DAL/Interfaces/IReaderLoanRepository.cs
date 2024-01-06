@@ -1,8 +1,18 @@
-﻿using Library.DAL.DomainModel;
+﻿//------------------------------------------------------------------------------
+// <copyright file="IReaderLoanRepository.cs" company="Transilvania University of Brasov">
+// Copyright (c) Conoval. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 namespace Library.DAL.Interfaces
 {
-    public  interface IReaderLoanRepository : IRepository<ReaderLoan>
+    using Library.DAL.DomainModel;
+
+    /// <summary>
+    /// Defines the <see cref="IReaderLoanRepository" />.
+    /// </summary>
+    public interface IReaderLoanRepository : IRepository<ReaderLoan>
     {
     }
 }
