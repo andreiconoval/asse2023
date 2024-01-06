@@ -105,7 +105,8 @@ namespace Library.BL.Services
         /// <param name="staffLendCount">Staff lend count for today.</param>
         public void CheckIfUserCanBorrowBooks(User user, ReaderLoan newLoan, List<ReaderLoan> previousLoans, int staffLendCount)
         {
-            if (user.LibraryStaff == null)
+            var distinctCategoriesCount = newLoan.BookLoanDetails.SelectMany(bld => bld.BookSample.BookEdition.Book.BookDomains.Select(bd => bd.DomainId)).Distinct().Count();
+            if (distinctCategoriesCount < 2)
             {
                 this.USER_IND = 2;
             }

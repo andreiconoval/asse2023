@@ -199,11 +199,58 @@ namespace LibraryBLTests
             Assert.Pass();
         }
 
-        //TODO add has subdomain test
+        [Test]
+        public void DeleteDomain_HasSubdomains_HardDelete_Test()
+        {
+            var domain = new Domain()
+            {
+                DomainName = "DomainName",
+                DomainId = 2,
+                Id = 1,
+                BookDomains = new List<BookDomain>() { new BookDomain() },
+                Subdomains = new List<Domain>() { new Domain() { Id = 3 } },
+            };
+
+            var subDomain = new Domain()
+            {
+                DomainName = "DomainName",
+                DomainId = 4,
+                Id = 3,
+                BookDomains = new List<BookDomain>(),
+                Subdomains = new List<Domain>(),
+            };
+
+            _bookDomainServiceMock.Setup(x => x.Delete(It.IsAny<BookDomain>()));
+
+            SetUpGetDomain(new List<Domain>() { domain, subDomain });
+
+            _domainService.Delete(domain, true);
+            _domainRepositoryMock.Verify(x => x.Delete(It.IsAny<Domain>()), Times.Exactly(2));
+            _bookDomainServiceMock.Verify(x => x.Delete(It.IsAny<BookDomain>()), Times.Once);
+            Assert.Pass();
+        }
 
         private void SetUpGetDomain(List<Domain> domains)
         {
-            _domainRepositoryMock.Setup(i => i.Get(It.IsAny<Expression<Func<Domain, bool>>>(), It.IsAny<Func<IQueryable<Domain>, IOrderedQueryable<Domain>>>(), It.IsAny<string>())).Returns(domains);
+            _domainRepositoryMock.Setup(i => i.Get(It.IsAny<Expression<Func<Domain, bool>>>(), It.IsAny<Func<IQueryable<Domain>, IOrderedQueryable<Domain>>>(), It.IsAny<string>())).
+                Returns<Expression<Func<Domain, bool>>, Func<IQueryable<Domain>, IOrderedQueryable<Domain>>, string>((filter, orderBy, includeProperties) =>
+                {
+                    var users = domains;
+
+                    // Apply the filter if provided
+                    if (filter != null)
+                    {
+                        users = users.Where(filter.Compile()).ToList();
+                    }
+
+                    // Apply ordering if provided
+                    if (orderBy != null)
+                    {
+                        users = orderBy(users.AsQueryable()).ToList();
+                    }
+
+                    return users.AsQueryable();
+                });
         }
 
     }
