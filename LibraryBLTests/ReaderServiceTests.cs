@@ -1,96 +1,140 @@
-﻿using Library.BL.Infrastructure;
-using Library.BL.Interfaces;
-using Library.BL.Services;
-using Library.DAL.DomainModel;
-using Library.DAL.Interfaces;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Linq.Expressions;
+﻿//------------------------------------------------------------------------------
+// <copyright file="ReaderServiceTests.cs" company="Transilvania University of Brasov">
+// Copyright (c) Conoval. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 namespace LibraryBLTests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using Library.BL.Infrastructure;
+    using Library.BL.Interfaces;
+    using Library.BL.Services;
+    using Library.DAL.DomainModel;
+    using Library.DAL.Interfaces;
+    using Moq;
+
+    /// <summary>
+    /// Defines the <see cref="ReaderServiceTests" />.
+    /// </summary>
     [ExcludeFromCodeCoverage]
     public class ReaderServiceTests
     {
+        /// <summary>
+        /// Defines the service.
+        /// </summary>
+        private IReaderService service;
 
-        #region Private fields
+        /// <summary>
+        /// Defines the logger.
+        /// </summary>
+        private Microsoft.Extensions.Logging.ILogger<IReaderService> logger;
 
-        IReaderService _service;
-        private readonly Microsoft.Extensions.Logging.ILogger<IReaderService> _logger;
-        Mock<IReaderRepository> _repositoryMock;
+        /// <summary>
+        /// Defines the repositoryMock.
+        /// </summary>
+        private Mock<IReaderRepository> repositoryMock;
 
-        #endregion
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReaderServiceTests"/> class.
+        /// </summary>
         public ReaderServiceTests()
         {
-            _logger = LoggerExtensions.TestLoggingInstance<IReaderService>();
+            this.logger = LoggerExtensions.TestLoggingInstance<IReaderService>();
         }
 
+        /// <summary>
+        /// The Setup.
+        /// </summary>
         [SetUp]
         public void Setup()
         {
-            _repositoryMock = new Mock<IReaderRepository>();
-            _service = new ReaderService(_repositoryMock.Object, _logger);
+            this.repositoryMock = new Mock<IReaderRepository>();
+            this.service = new ReaderService(this.repositoryMock.Object, this.logger);
         }
 
+        /// <summary>
+        /// The Constructor_Test.
+        /// </summary>
         [Test]
         public void Constructor_Test()
         {
-            Assert.That(_service, Is.Not.Null);
+            Assert.That(this.service, Is.Not.Null);
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The Insert_NullArgumentException_Test.
+        /// </summary>
         [Test]
-        public void Insert_NullArgumetException_Test()
+        public void Insert_NullArgumentException_Test()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => _service.Insert(null));
+            var ex = Assert.Throws<ArgumentNullException>(() => this.service.Insert(null));
             Assert.That(ex, Is.Not.Null);
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The Insert_InvalidEntity_Test.
+        /// </summary>
         [Test]
         public void Insert_InvalidEntity_Test()
         {
-            var result = _service.Insert(new Reader());
+            var result = this.service.Insert(new Reader());
             Assert.That(result.IsValid, Is.EqualTo(false));
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The Insert_Success_Test.
+        /// </summary>
         [Test]
-        public void Insert_Succes_Test()
+        public void Insert_Success_Test()
         {
-            var result = _service.Insert(new Reader() { UserId = 1 });
+            var result = this.service.Insert(new Reader() { UserId = 1 });
             Assert.That(result.IsValid, Is.EqualTo(true));
-            _repositoryMock.Verify(i => i.Insert(It.IsAny<Reader>()), Times.Once);
+            this.repositoryMock.Verify(i => i.Insert(It.IsAny<Reader>()), Times.Once);
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The Update_Success_Test.
+        /// </summary>
         [Test]
-        public void Update_Succes_Test()
+        public void Update_Success_Test()
         {
-            var result = _service.Update(new Reader() { UserId = 1 });
+            var result = this.service.Update(new Reader() { UserId = 1 });
             Assert.That(result.IsValid, Is.EqualTo(true));
-            _repositoryMock.Verify(i => i.Update(It.IsAny<Reader>()), Times.Once);
+            this.repositoryMock.Verify(i => i.Update(It.IsAny<Reader>()), Times.Once);
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The GetAll_Test.
+        /// </summary>
         [Test]
         public void GetAll_Test()
         {
-            SetUpGetReader(new List<Reader>() { new Reader() });
+            this.SetUpGetReader(new List<Reader>() { new Reader() });
 
-            var result = _service.GetAll();
+            var result = this.service.GetAll();
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(1));
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The SetUpGetReader.
+        /// </summary>
+        /// <param name="readers">The readers<see cref="List{Reader}"/>.</param>
         private void SetUpGetReader(List<Reader> readers)
         {
-            _repositoryMock.Setup(i => i.Get(It.IsAny<Expression<Func<Reader, bool>>>(), It.IsAny<Func<IQueryable<Reader>, IOrderedQueryable<Reader>>>(), It.IsAny<string>()))
+            this.repositoryMock.Setup(i => i.Get(It.IsAny<Expression<Func<Reader, bool>>>(), It.IsAny<Func<IQueryable<Reader>, IOrderedQueryable<Reader>>>(), It.IsAny<string>()))
                 .Returns(readers);
         }
     }

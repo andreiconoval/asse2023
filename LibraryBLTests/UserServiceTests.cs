@@ -1,78 +1,120 @@
-﻿using Library.BL.Infrastructure;
-using Library.BL.Interfaces;
-using Library.BL.Services;
-using Library.DAL.DomainModel;
-using Library.DAL.Interfaces;
-using Moq;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
+﻿//------------------------------------------------------------------------------
+// <copyright file="UserServiceTests.cs" company="Transilvania University of Brasov">
+// Copyright (c) Conoval. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 namespace LibraryBLTests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using Library.BL.Infrastructure;
+    using Library.BL.Interfaces;
+    using Library.BL.Services;
+    using Library.DAL.DomainModel;
+    using Library.DAL.Interfaces;
+    using Moq;
+    using NUnit.Framework;
+
+    /// <summary>
+    /// Defines the <see cref="UserUnitTests" />.
+    /// </summary>
     [ExcludeFromCodeCoverage]
-    public class UserUnitTests
+    public class UserServiceTests
     {
-        IUserService _userService;
-        private readonly Microsoft.Extensions.Logging.ILogger<IUserService> _logger;
-        Mock<IUserRepository> _userRepositoryMock;
+        /// <summary>
+        /// Defines the userService.
+        /// </summary>
+        private IUserService userService;
 
-        #region
+        /// <summary>
+        /// Defines the logger.
+        /// </summary>
+        private Microsoft.Extensions.Logging.ILogger<IUserService> logger;
 
-        private int ID = 1;
+        /// <summary>
+        /// Defines the userRepositoryMock.
+        /// </summary>
+        private Mock<IUserRepository> userRepositoryMock;
 
-        #endregion
+        /// <summary>
+        /// Defines the ID.
+        /// </summary>
+        private int id = 1;
 
-        public UserUnitTests()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserServiceTests"/> class.
+        /// </summary>
+        public UserServiceTests()
         {
-            _logger = LoggerExtensions.TestLoggingInstance<IUserService>();
+            this.logger = LoggerExtensions.TestLoggingInstance<IUserService>();
         }
 
+        /// <summary>
+        /// The Setup.
+        /// </summary>
         [SetUp]
         public void Setup()
         {
-            _userRepositoryMock = new Mock<IUserRepository>();
-            _userService = new UserService(_userRepositoryMock.Object, _logger);
+            this.userRepositoryMock = new Mock<IUserRepository>();
+            this.userService = new UserService(this.userRepositoryMock.Object, this.logger);
         }
 
+        /// <summary>
+        /// The Constructor_Test.
+        /// </summary>
         [Test]
         public void Constructor_Test()
         {
-            _userService = new UserService(_userRepositoryMock.Object, _logger);
-            Assert.That(_userService, Is.Not.Null);
+            this.userService = new UserService(this.userRepositoryMock.Object, this.logger);
+            Assert.That(this.userService, Is.Not.Null);
             Assert.Pass();
         }
 
-
-
+        /// <summary>
+        /// The DeleteUser_InvalidId_Test.
+        /// </summary>
         [Test]
         public void DeleteUser_InvalidId_Test()
         {
-            _userRepositoryMock.Setup(x => x.GetByID(It.IsAny<object>())).Returns<User>(null);
+            this.userRepositoryMock.Setup(x => x.GetByID(It.IsAny<object>())).Returns<User>(null);
 
-            var ex = Assert.Throws<ArgumentException>(() => _userService.DeleteUser(ID));
-            Assert.That(ex.Message, Is.EqualTo($"Cannot delete user with id: {ID}, id is invalid"));
+            var ex = Assert.Throws<ArgumentException>(() => this.userService.DeleteUser(this.id));
+            Assert.That(ex.Message, Is.EqualTo($"Cannot delete user with this.id: {this.id}, this.id is invalid"));
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The DeleteUser_Success_Test.
+        /// </summary>
         [Test]
         public void DeleteUser_Success_Test()
         {
-            var user = new User { Id = ID };
-            _userRepositoryMock.Setup(x => x.GetByID(It.IsAny<object>())).Returns(user);
+            var user = new User { Id = this.id };
+            this.userRepositoryMock.Setup(x => x.GetByID(It.IsAny<object>())).Returns(user);
 
-            _userService.DeleteUser(ID);
+            this.userService.DeleteUser(this.id);
             Assert.Pass();
         }
 
-
+        /// <summary>
+        /// The AddUser_InvalidAuthor_Test.
+        /// </summary>
         [Test]
         public void AddUser_InvalidAuthor_Test()
         {
-            var ex = Assert.Throws<ArgumentException>(() => _userService.AddUser(new User()));
+            var ex = Assert.Throws<ArgumentException>(() => this.userService.AddUser(new User()));
             Assert.That(ex.Message, Is.EqualTo("Cannot add user, invalid entity"));
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The AddUser_UserExists_Test.
+        /// </summary>
         [Test]
         public void AddUser_UserExists_Test()
         {
@@ -84,19 +126,22 @@ namespace LibraryBLTests
                 Phone = "000000",
                 Email = "Email"
             };
-            _userRepositoryMock.Setup(x => x.Get(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<Func<IQueryable<User>, IOrderedQueryable<User>>>(), It.IsAny<string>())).Returns(new List<User>() { user });
+            this.userRepositoryMock.Setup(x => x.Get(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<Func<IQueryable<User>, IOrderedQueryable<User>>>(), It.IsAny<string>())).Returns(new List<User>() { user });
 
-            var ex = Assert.Throws<ArgumentException>(() => _userService.AddUser(user));
+            var ex = Assert.Throws<ArgumentException>(() => this.userService.AddUser(user));
             Assert.That(ex.Message, Is.EqualTo("Cannot add user, user already exists"));
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The AddUser_Success_Test.
+        /// </summary>
         [Test]
         public void AddUser_Success_Test()
         {
             var user = new User()
             {
-                Id = ID,
+                Id = this.id,
                 FirstName = "FirstName",
                 LastName = "LastName",
                 Address = "Address",
@@ -104,27 +149,31 @@ namespace LibraryBLTests
                 Email = "Email"
             };
 
-            var result = _userService.AddUser(user);
-            Assert.That(result, Is.EqualTo(ID));
+            var result = this.userService.AddUser(user);
+            Assert.That(result, Is.EqualTo(this.id));
             Assert.Pass();
         }
 
-
+        /// <summary>
+        /// The UpdateUser_InvalidUser_Test.
+        /// </summary>
         [Test]
         public void UpdateUser_InvalidUser_Test()
         {
-            var ex = Assert.Throws<ArgumentException>(() => _userService.UpdateUser(new User()));
+            var ex = Assert.Throws<ArgumentException>(() => this.userService.UpdateUser(new User()));
             Assert.That(ex.Message, Is.EqualTo("Cannot update user, invalid entity"));
             Assert.Pass();
         }
 
-
+        /// <summary>
+        /// The UpdateAuthor_Success_Test.
+        /// </summary>
         [Test]
-        public void UdateAuthor_Success_Test()
+        public void UpdateAuthor_Success_Test()
         {
             var user = new User()
             {
-                Id = ID,
+                Id = this.id,
                 FirstName = "FirstName",
                 LastName = "LastName",
                 Address = "Address",
@@ -132,30 +181,31 @@ namespace LibraryBLTests
                 Email = "Email"
             };
 
-            _userRepositoryMock.Setup(x => x.Get(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<Func<IQueryable<User>, IOrderedQueryable<User>>>(), It.IsAny<string>())).Returns(new List<User>() { user });
+            this.userRepositoryMock.Setup(x => x.Get(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<Func<IQueryable<User>, IOrderedQueryable<User>>>(), It.IsAny<string>())).Returns(new List<User>() { user });
 
-            _userService.UpdateUser(user);
+            this.userService.UpdateUser(user);
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The UpdateAuthor_MissingAuthor_Test.
+        /// </summary>
         [Test]
-        public void UdateAuthor_MissingAuthor_Test()
+        public void UpdateAuthor_MissingAuthor_Test()
         {
             var user = new User()
             {
-                Id = ID,
+                Id = this.id,
                 FirstName = "FirstName",
                 LastName = "LastName",
                 Address = "Address",
                 Phone = "000000",
                 Email = "Email"
             };
-            _userRepositoryMock.Setup(x => x.Get(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<Func<IQueryable<User>, IOrderedQueryable<User>>>(), It.IsAny<string>())).Returns(new List<User>() { });
-
-            var ex = Assert.Throws<ArgumentException>(() => _userService.UpdateUser(user));
+            this.userRepositoryMock.Setup(x => x.Get(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<Func<IQueryable<User>, IOrderedQueryable<User>>>(), It.IsAny<string>())).Returns(new List<User>() { });
+            var ex = Assert.Throws<ArgumentException>(() => this.userService.UpdateUser(user));
             Assert.That(ex.Message, Is.EqualTo("Cannot update user, entity is missing"));
             Assert.Pass();
         }
-
     }
 }

@@ -1,62 +1,104 @@
-﻿using Library.BL.Infrastructure;
-using Library.BL.Interfaces;
-using Library.BL.Services;
-using Library.DAL.DomainModel;
-using Library.DAL.Interfaces;
-using Moq;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
+﻿//------------------------------------------------------------------------------
+// <copyright file="DomainServiceTests.cs" company="Transilvania University of Brasov">
+// Copyright (c) Conoval. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 namespace LibraryBLTests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using Library.BL.Infrastructure;
+    using Library.BL.Interfaces;
+    using Library.BL.Services;
+    using Library.DAL.DomainModel;
+    using Library.DAL.Interfaces;
+    using Moq;
+
+    /// <summary>
+    /// Defines the <see cref="DomainServiceTests" />.
+    /// </summary>
     [ExcludeFromCodeCoverage]
     public class DomainServiceTests
     {
-        #region Private fields
+        /// <summary>
+        /// Defines the domainService.
+        /// </summary>
+        private IDomainService domainService;
 
-        IDomainService _domainService;
-        private readonly Microsoft.Extensions.Logging.ILogger<IDomainService> _logger;
-        Mock<IDomainRepository> _domainRepositoryMock;
-        Mock<IBookDomainService> _bookDomainServiceMock;
+        /// <summary>
+        /// Defines the logger.
+        /// </summary>
+        private Microsoft.Extensions.Logging.ILogger<IDomainService> logger;
 
-        #endregion
+        /// <summary>
+        /// Defines the domainRepositoryMock.
+        /// </summary>
+        private Mock<IDomainRepository> domainRepositoryMock;
 
+        /// <summary>
+        /// Defines the bookDomainServiceMock.
+        /// </summary>
+        private Mock<IBookDomainService> bookDomainServiceMock;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DomainServiceTests"/> class.
+        /// </summary>
         public DomainServiceTests()
         {
-            _logger = LoggerExtensions.TestLoggingInstance<IDomainService>();
+            this.logger = LoggerExtensions.TestLoggingInstance<IDomainService>();
         }
 
+        /// <summary>
+        /// The Setup.
+        /// </summary>
         [SetUp]
         public void Setup()
         {
-            _domainRepositoryMock = new Mock<IDomainRepository>();
-            _bookDomainServiceMock = new Mock<IBookDomainService>();
-            _domainService = new DomainService(_domainRepositoryMock.Object, _logger, _bookDomainServiceMock.Object);
+            this.domainRepositoryMock = new Mock<IDomainRepository>();
+            this.bookDomainServiceMock = new Mock<IBookDomainService>();
+            this.domainService = new DomainService(this.domainRepositoryMock.Object, this.logger, this.bookDomainServiceMock.Object);
         }
 
+        /// <summary>
+        /// The Constructor_Test.
+        /// </summary>
         [Test]
         public void Constructor_Test()
         {
-            Assert.That(_domainService, Is.Not.Null);
+            Assert.That(this.domainService, Is.Not.Null);
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The AddDomain_NullArgumentException_Test.
+        /// </summary>
         [Test]
-        public void AddDomain_NullArgumetException_Test()
+        public void AddDomain_NullArgumentException_Test()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => _domainService.Insert(null));
+            var ex = Assert.Throws<ArgumentNullException>(() => this.domainService.Insert(null));
             Assert.That(ex, Is.Not.Null);
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The AddDomain_InvalidEntity_Test.
+        /// </summary>
         [Test]
         public void AddDomain_InvalidEntity_Test()
         {
-            var ex = Assert.Throws<ArgumentException>(() => _domainService.Insert(new Domain()));
+            var ex = Assert.Throws<ArgumentException>(() => this.domainService.Insert(new Domain()));
             Assert.That(ex.Message, Is.EqualTo("Cannot add new domain, entity is invalid"));
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The AddDomain_DomainExist_Test.
+        /// </summary>
         [Test]
         public void AddDomain_DomainExist_Test()
         {
@@ -66,13 +108,16 @@ namespace LibraryBLTests
                 DomainId = 2
             };
 
-            SetUpGetDomain(new List<Domain>() { domain });
+            this.SetUpGetDomain(new List<Domain>() { domain });
 
-            var ex = Assert.Throws<ArgumentException>(() => _domainService.Insert(domain));
+            var ex = Assert.Throws<ArgumentException>(() => this.domainService.Insert(domain));
             Assert.That(ex.Message, Is.EqualTo("Cannot add new domain, entity already exists"));
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The AddDomain_Success_Test.
+        /// </summary>
         [Test]
         public void AddDomain_Success_Test()
         {
@@ -82,31 +127,40 @@ namespace LibraryBLTests
                 DomainId = 2
             };
 
-            SetUpGetDomain(new List<Domain>());
+            this.SetUpGetDomain(new List<Domain>());
 
-            var result = _domainService.Insert(domain);
+            var result = this.domainService.Insert(domain);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.IsValid, Is.True);
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The UpdateDomain_NullArgumentException_Test.
+        /// </summary>
         [Test]
-        public void UpdateDomain_NullArgumetException_Test()
+        public void UpdateDomain_NullArgumentException_Test()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => _domainService.Update(null));
+            var ex = Assert.Throws<ArgumentNullException>(() => this.domainService.Update(null));
             Assert.That(ex, Is.Not.Null);
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The UpdateDomain_InvalidEntity_Test.
+        /// </summary>
         [Test]
         public void UpdateDomain_InvalidEntity_Test()
         {
-            var ex = Assert.Throws<ArgumentException>(() => _domainService.Update(new Domain()));
+            var ex = Assert.Throws<ArgumentException>(() => this.domainService.Update(new Domain()));
             Assert.That(ex, Is.Not.Null);
             Assert.That(ex.Message, Is.EqualTo("Cannot update domain, invalid entity"));
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The UpdateDomain_DomainDoesNotExist_Test.
+        /// </summary>
         [Test]
         public void UpdateDomain_DomainDoesNotExist_Test()
         {
@@ -116,13 +170,16 @@ namespace LibraryBLTests
                 DomainId = 2
             };
 
-            SetUpGetDomain(new List<Domain>());
+            this.SetUpGetDomain(new List<Domain>());
 
-            var ex = Assert.Throws<ArgumentException>(() => _domainService.Update(domain));
+            var ex = Assert.Throws<ArgumentException>(() => this.domainService.Update(domain));
             Assert.That(ex.Message, Is.EqualTo("Cannot update domain, entity is missing"));
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The UpdateDomain_Success_Test.
+        /// </summary>
         [Test]
         public void UpdateDomain_Success_Test()
         {
@@ -132,15 +189,17 @@ namespace LibraryBLTests
                 DomainId = 2
             };
 
-            SetUpGetDomain(new List<Domain>() { domain });
+            this.SetUpGetDomain(new List<Domain>() { domain });
 
-            var result = _domainService.Update(domain);
+            var result = this.domainService.Update(domain);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.IsValid, Is.True);
             Assert.Pass();
         }
 
-
+        /// <summary>
+        /// The DeleteDomain_DomainDoesNotExist_Test.
+        /// </summary>
         [Test]
         public void DeleteDomain_DomainDoesNotExist_Test()
         {
@@ -151,13 +210,16 @@ namespace LibraryBLTests
                 Id = 1
             };
 
-            SetUpGetDomain(new List<Domain>());
+            this.SetUpGetDomain(new List<Domain>());
 
-            var ex = Assert.Throws<ArgumentException>(() => _domainService.Delete(domain, false));
+            var ex = Assert.Throws<ArgumentException>(() => this.domainService.Delete(domain, false));
             Assert.That(ex.Message, Is.EqualTo("Cannot delete domain, entity is missing"));
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The DeleteDomain_HasBooks_Test.
+        /// </summary>
         [Test]
         public void DeleteDomain_HasBooks_Test()
         {
@@ -170,13 +232,16 @@ namespace LibraryBLTests
                 BookDomains = new List<BookDomain>() { new BookDomain() },
             };
 
-            SetUpGetDomain(new List<Domain>() { domain });
+            this.SetUpGetDomain(new List<Domain>() { domain });
 
-            var ex = Assert.Throws<ArgumentException>(() => _domainService.Delete(domain, false));
+            var ex = Assert.Throws<ArgumentException>(() => this.domainService.Delete(domain, false));
             Assert.That(ex.Message, Is.EqualTo("Cannot delete domain, entity has relations"));
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The DeleteDomain_HasBooks_HardDelete_Test.
+        /// </summary>
         [Test]
         public void DeleteDomain_HasBooks_HardDelete_Test()
         {
@@ -189,16 +254,19 @@ namespace LibraryBLTests
                 Subdomains = new List<Domain>(),
             };
 
-            _bookDomainServiceMock.Setup(x => x.Delete(It.IsAny<BookDomain>()));
+            this.bookDomainServiceMock.Setup(x => x.Delete(It.IsAny<BookDomain>()));
 
-            SetUpGetDomain(new List<Domain>() { domain });
+            this.SetUpGetDomain(new List<Domain>() { domain });
 
-            _domainService.Delete(domain, true);
-            _domainRepositoryMock.Verify(x => x.Delete(It.IsAny<Domain>()), Times.Once);
-            _bookDomainServiceMock.Verify(x => x.Delete(It.IsAny<BookDomain>()), Times.Once);
+            this.domainService.Delete(domain, true);
+            this.domainRepositoryMock.Verify(x => x.Delete(It.IsAny<Domain>()), Times.Once);
+            this.bookDomainServiceMock.Verify(x => x.Delete(It.IsAny<BookDomain>()), Times.Once);
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The DeleteDomain_HasSubdomains_HardDelete_Test.
+        /// </summary>
         [Test]
         public void DeleteDomain_HasSubdomains_HardDelete_Test()
         {
@@ -220,30 +288,32 @@ namespace LibraryBLTests
                 Subdomains = new List<Domain>(),
             };
 
-            _bookDomainServiceMock.Setup(x => x.Delete(It.IsAny<BookDomain>()));
+            this.bookDomainServiceMock.Setup(x => x.Delete(It.IsAny<BookDomain>()));
 
-            SetUpGetDomain(new List<Domain>() { domain, subDomain });
+            this.SetUpGetDomain(new List<Domain>() { domain, subDomain });
 
-            _domainService.Delete(domain, true);
-            _domainRepositoryMock.Verify(x => x.Delete(It.IsAny<Domain>()), Times.Exactly(2));
-            _bookDomainServiceMock.Verify(x => x.Delete(It.IsAny<BookDomain>()), Times.Once);
+            this.domainService.Delete(domain, true);
+            this.domainRepositoryMock.Verify(x => x.Delete(It.IsAny<Domain>()), Times.Exactly(2));
+            this.bookDomainServiceMock.Verify(x => x.Delete(It.IsAny<BookDomain>()), Times.Once);
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The SetUpGetDomain.
+        /// </summary>
+        /// <param name="domains">The domains<see cref="List{Domain}"/>.</param>
         private void SetUpGetDomain(List<Domain> domains)
         {
-            _domainRepositoryMock.Setup(i => i.Get(It.IsAny<Expression<Func<Domain, bool>>>(), It.IsAny<Func<IQueryable<Domain>, IOrderedQueryable<Domain>>>(), It.IsAny<string>())).
-                Returns<Expression<Func<Domain, bool>>, Func<IQueryable<Domain>, IOrderedQueryable<Domain>>, string>((filter, orderBy, includeProperties) =>
+            this.domainRepositoryMock.Setup(i => i.Get(It.IsAny<Expression<Func<Domain, bool>>>(), It.IsAny<Func<IQueryable<Domain>, IOrderedQueryable<Domain>>>(), It.IsAny<string>()))
+                .Returns<Expression<Func<Domain, bool>>, Func<IQueryable<Domain>, IOrderedQueryable<Domain>>, string>((filter, orderBy, includeProperties) =>
                 {
                     var users = domains;
 
-                    // Apply the filter if provided
                     if (filter != null)
                     {
                         users = users.Where(filter.Compile()).ToList();
                     }
 
-                    // Apply ordering if provided
                     if (orderBy != null)
                     {
                         users = orderBy(users.AsQueryable()).ToList();
@@ -252,6 +322,5 @@ namespace LibraryBLTests
                     return users.AsQueryable();
                 });
         }
-
     }
 }
