@@ -84,7 +84,7 @@ namespace LibraryBLTests
             this.userRepositoryMock.Setup(x => x.GetByID(It.IsAny<object>())).Returns<User>(null);
 
             var ex = Assert.Throws<ArgumentException>(() => this.userService.DeleteUser(this.id));
-            Assert.That(ex.Message, Is.EqualTo($"Cannot delete user with this.id: {this.id}, this.id is invalid"));
+            Assert.That(ex.Message, Is.EqualTo($"Cannot delete user with id: {this.id}, id is invalid"));
             Assert.Pass();
         }
 

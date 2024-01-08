@@ -1,139 +1,89 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="LibrarySettingsService.cs" company="Transilvania University of Brasov">
-// Copyright (c) Conoval. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
-// </copyright>
-//------------------------------------------------------------------------------
+﻿
+using Library.BL.Interfaces;
+using Library.DAL.DomainModel;
+using Library.DAL.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Library.BL.Services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Library.BL.Interfaces;
-    using Library.DAL.DomainModel;
-    using Library.DAL.Interfaces;
 
-    /// <summary>
-    /// Defines the <see cref="LibrarySettingsService" />.
-    /// </summary>
     public class LibrarySettingsService : ILibrarySettingsService
     {
-        /// <summary>
-        /// Defines the _librarySettingsRepository.
-        /// </summary>
-        private readonly ILibrarySettingsRepository librarySettingsRepository;
+        private readonly ILibrarySettingsRepository _librarySettingsRepository;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LibrarySettingsService"/> class.
-        /// </summary>
-        /// <param name="librarySettingsRepository">The librarySettingsRepository<see cref="ILibrarySettingsRepository"/>.</param>
+        #region Public fields
+
+        public int DOMENII { get => LibrarySettings.MaxDomains; }
+
+        public int NMC { get => LibrarySettings.MaxBookBorrowed * USER_IND; }
+
+        public int PER { get => LibrarySettings.BorrowedBooksPeriod / USER_IND; }
+
+        public int C { get => LibrarySettings.MaxBooksBorrowedPerTime * USER_IND; }
+
+        public int D { get => LibrarySettings.MaxAllowedBooksPerDomain * USER_IND; }
+
+        public int L { get => LibrarySettings.AllowedMonthsForSameDomain; }
+
+        public int LIM { get => LibrarySettings.BorrowedBooksExtensionLimit * USER_IND; }
+
+        public int DELTA { get => LibrarySettings.SameBookRepeatBorrowingLimit / USER_IND; }
+
+        public int NCZ { get => LibrarySettings.MaxBorrowedBooksPerDay; }
+
+        public int PERSIMP { get => LibrarySettings.LimitBookLend; }
+
+        public int USER_IND { get; set; } = 1;
+
+        public LibrarySettings LibrarySettings { get; set; }
+
+        #endregion Public fields
+
         public LibrarySettingsService(ILibrarySettingsRepository librarySettingsRepository)
         {
-            this.librarySettingsRepository = librarySettingsRepository ?? throw new ArgumentNullException();
-            LibrarySettings = this.librarySettingsRepository.Get();
+            _librarySettingsRepository = librarySettingsRepository ?? throw new ArgumentNullException();
+            LibrarySettings = _librarySettingsRepository.Get();
         }
 
         /// <summary>
-        /// Gets the DOMENII.
+        /// Check base on library settings is user can borrow books or not
         /// </summary>
-        public int DOMENII { get => LibrarySettings.MaxDomains; }
-
-        /// <summary>
-        /// Gets the NMC.
-        /// </summary>
-        public int NMC { get => LibrarySettings.MaxBookBorrowed * this.USER_IND; }
-
-        /// <summary>
-        /// Gets the PER.
-        /// </summary>
-        public int PER { get => LibrarySettings.BorrowedBooksPeriod / this.USER_IND; }
-
-        /// <summary>
-        /// Gets the C.
-        /// </summary>
-        public int C { get => LibrarySettings.MaxBooksBorrowedPerTime * this.USER_IND; }
-
-        /// <summary>
-        /// Gets the D.
-        /// </summary>
-        public int D { get => LibrarySettings.MaxAllowedBooksPerDomain * this.USER_IND; }
-
-        /// <summary>
-        /// Gets the L.
-        /// </summary>
-        public int L { get => LibrarySettings.AllowedMonthsForSameDomain; }
-
-        /// <summary>
-        /// Gets the LIM.
-        /// </summary>
-        public int LIM { get => LibrarySettings.BorrowedBooksExtensionLimit * this.USER_IND; }
-
-        /// <summary>
-        /// Gets the DELTA.
-        /// </summary>
-        public int DELTA { get => LibrarySettings.SameBookRepeatBorrowingLimit / this.USER_IND; }
-
-        /// <summary>
-        /// Gets the NCZ.
-        /// </summary>
-        public int NCZ { get => LibrarySettings.MaxBorrowedBooksPerDay; }
-
-        /// <summary>
-        /// Gets the PERSIMP
-        /// LimitBookLend.
-        /// </summary>
-        public int PERSIMP { get => LibrarySettings.LimitBookLend; }
-
-        /// <summary>
-        /// Gets or sets the USER_IND
-        /// User index if is staff should be 2 if reader 1.
-        /// </summary>
-        public int USER_IND { get; set; } = 1;
-
-        /// <summary>
-        /// Gets or sets the LibrarySettings.
-        /// </summary>
-        public LibrarySettings LibrarySettings { get; set; }
-
-        /// <summary>
-        /// Check base on library settings is user can borrow books or not.
-        /// </summary>
-        /// <param name="user">User that with borrow.</param>
-        /// <param name="newLoan">New reader loan.</param>
-        /// <param name="previousLoans">Previous user loans.</param>
-        /// <param name="staffLendCount">Staff lend count for today.</param>
+        /// <param name="user">User that with borrow</param>
+        /// <param name="newLoan">New redear loan</param>
+        /// <param name="previousLoans">Previous user loans</param>
+        /// <param name="staffLendCount">Staff lend count for today</param>
+        /// <exception cref="ArgumentException"></exception>
         public void CheckIfUserCanBorrowBooks(User user, ReaderLoan newLoan, List<ReaderLoan> previousLoans, int staffLendCount)
         {
-            var distinctCategoriesCount = newLoan.BookLoanDetails.SelectMany(bld => bld.BookSample.BookEdition.Book.BookDomains.Select(bd => bd.DomainId)).Distinct().Count();
-            if (distinctCategoriesCount < 2)
+            if (user.LibraryStaff == null)
             {
-                this.USER_IND = 2;
+                USER_IND = 2;
             }
             else
             {
-                this.USER_IND = 1;
+                USER_IND = 1;
             }
-            
             // Implementare pentru cerinte si limitari
 
             // Verificare limita NMC in perioada PER
-            var loansInPeriod = previousLoans.Count(pl => (DateTime.Now - pl.LoanDate).TotalDays <= this.PER);
-            if (loansInPeriod + 1 > this.NMC)
+            var loansInPeriod = previousLoans.Count(pl => (DateTime.Now - pl.LoanDate).TotalDays <= PER);
+            if (loansInPeriod + 1 > NMC)
             {
                 throw new ArgumentException("Exceeded maximum books borrowed in the specified period.");
             }
 
             // Verificare limita C
-            if (newLoan?.BookLoanDetails?.Count() > this.C)
+            if (newLoan.BookLoanDetails.Count() > C)
             {
                 throw new ArgumentException("Exceeded maximum books borrowed per time.");
             }
 
             // Verificare categorii distincte daca sunt cel putin 3 carti imprumutate
-            if (newLoan?.BookLoanDetails?.Count() >= 3)
+            if (newLoan.BookLoanDetails.Count() >= 3)
             {
-                var distinctCategoriesCount = newLoan.BookLoanDetails.Select(bld => bld.BookSample?.BookEdition?.Book?.BookDomains?.Select(bd => bd.DomainId)).Distinct().Count();
+                var distinctCategoriesCount = newLoan.BookLoanDetails.SelectMany(bld => bld.BookSample.BookEdition.Book.BookDomains.Select(bd => bd.DomainId)).Distinct().Count();
                 if (distinctCategoriesCount < 2)
                 {
                     throw new ArgumentException("At least 2 distinct categories are required for borrowing 3 or more books.");
@@ -142,36 +92,34 @@ namespace Library.BL.Services
 
             // Verificare limita D pentru carti din acelasi domeniu in ultimele L luni
             var currentDate = DateTime.Now;
-            var lastMonthsDate = currentDate.AddMonths(-this.L);
-            var recentBorrowedBooks = previousLoans.SelectMany(pl => pl.BookLoanDetails ?? Enumerable.Empty<BookLoanDetail>())
+            var lastMonthsDate = currentDate.AddMonths(-L);
+            var recentBorrowedBooks = previousLoans.SelectMany(pl => pl.BookLoanDetails)
                                                   .Where(bld => bld.LoanDate >= lastMonthsDate && bld.LoanDate <= currentDate)
                                                   .ToList();
 
-            var borrowedBooksFromSameDomain = recentBorrowedBooks.Count(bld =>
-                            bld?.BookSample?.BookEdition?.Book?.BookDomains?.Any(bd =>
-                            bd.DomainId == newLoan?.BookLoanDetails?.First().BookSample?.BookEdition?.Book?.BookDomains?.First().DomainId) ?? false);
-            if (borrowedBooksFromSameDomain + newLoan?.BookLoanDetails?.Count() > this.D)
+            var borrowedBooksFromSameDomain = recentBorrowedBooks.Count(bld => bld.BookSample.BookEdition.Book.BookDomains.Any(bd => bd.DomainId == newLoan.BookLoanDetails.First().BookSample.BookEdition.Book.BookDomains.First().DomainId));
+            if (borrowedBooksFromSameDomain + newLoan.BookLoanDetails.Count() > D)
             {
                 throw new ArgumentException("Exceeded maximum allowed books from the same domain in the specified period.");
             }
 
             // Verificare limita DELTA pentru aceeasi carte
-            var lastBorrowedBook = previousLoans.SelectMany(pl => pl?.BookLoanDetails ?? Enumerable.Empty<BookLoanDetail>()).OrderByDescending(bld => bld.LoanDate).FirstOrDefault();
-            if (lastBorrowedBook != null && (DateTime.Now - lastBorrowedBook.LoanDate).Days < this.DELTA)
+            var lastBorrowedBook = previousLoans.SelectMany(pl => pl.BookLoanDetails).OrderByDescending(bld => bld.LoanDate).FirstOrDefault();
+            if (lastBorrowedBook != null && (DateTime.Now - lastBorrowedBook.LoanDate).Days < DELTA)
             {
                 throw new ArgumentException("Cannot borrow the same book within the specified interval.");
             }
 
             // Verificare limita pentru personalul bibliotecii
-            if (staffLendCount > this.PERSIMP)
+            if (staffLendCount > PERSIMP)
             {
                 throw new ArgumentException("Exceeded maximum books that library staff can lend in a day.");
             }
 
-            var loansForNewLoanDay = previousLoans.Where(pl => pl.LoanDate.Date == newLoan?.LoanDate.Date).SelectMany(pl => pl?.BookLoanDetails ?? Enumerable.Empty<BookLoanDetail>()).Count();
+            var loansForNewLoanDay = previousLoans.Where(pl => pl.LoanDate.Date == newLoan.LoanDate.Date).SelectMany(pl => pl.BookLoanDetails).Count();
 
             if (user.LibraryStaff == null &&
-                (newLoan?.BookLoanDetails?.Count() > this.NCZ || loansForNewLoanDay + newLoan?.BookLoanDetails?.Count() > this.NCZ))
+                (newLoan.BookLoanDetails.Count() > NCZ || loansForNewLoanDay + newLoan.BookLoanDetails.Count() > NCZ))
             {
                 throw new ArgumentException("Reader exceed limit for today");
             }

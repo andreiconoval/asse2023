@@ -16,6 +16,7 @@ namespace LibraryBLTests
     using Library.DAL.DomainModel;
     using Library.DAL.Interfaces;
     using Moq;
+    using NUnit.Framework;
 
     /// <summary>
     /// Defines the <see cref="LibrarySettingsServiceTests" />.
