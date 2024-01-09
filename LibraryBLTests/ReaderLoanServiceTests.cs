@@ -279,7 +279,10 @@ namespace LibraryBLTests
                         ExpectedReturnDate = DateTime.Now.AddDays(14),
                         EffectiveReturnDate = null
                     }
-                }
+                },
+                Reader = new Reader(),
+                ExtensionsGranted = 1,
+                Id = 1
             };
 
             var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.Insert(readerLoan));

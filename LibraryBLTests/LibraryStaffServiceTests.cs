@@ -1,5 +1,5 @@
 ﻿//------------------------------------------------------------------------------
-// <copyright file="ReaderServiceTests.cs" company="Transilvania University of Brasov">
+// <copyright file="LibraryBLTests.cs" company="Transilvania University of Brasov">
 // Copyright (c) Conoval. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -7,46 +7,41 @@
 
 namespace LibraryBLTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using Library.BL.Infrastructure;
     using Library.BL.Interfaces;
     using Library.BL.Services;
     using Library.DAL.DomainModel;
     using Library.DAL.Interfaces;
     using Moq;
     using NUnit.Framework;
+    using System.Diagnostics.CodeAnalysis;
+    using Library.BL.Infrastructure;
+    using System.Linq.Expressions;
 
-    /// <summary>
-    /// Defines the <see cref="ReaderServiceTests" />.
-    /// </summary>
     [ExcludeFromCodeCoverage]
-    public class ReaderServiceTests
+
+    public class LibraryStaffServiceTests
     {
         /// <summary>
         /// Defines the service.
         /// </summary>
-        private IReaderService service;
+        private ILibraryStaffService service;
 
         /// <summary>
         /// Defines the logger.
         /// </summary>
-        private Microsoft.Extensions.Logging.ILogger<IReaderService> logger;
+        private Microsoft.Extensions.Logging.ILogger<ILibraryStaffService> logger;
 
         /// <summary>
         /// Defines the repositoryMock.
         /// </summary>
-        private Mock<IReaderRepository> repositoryMock;
+        private Mock<ILibraryStaffRepository> repositoryMock;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReaderServiceTests"/> class.
+        /// Initializes a new instance of the <see cref="LibraryStaffServiceTests"/> class.
         /// </summary>
-        public ReaderServiceTests()
+        public LibraryStaffServiceTests()
         {
-            this.logger = LoggerExtensions.TestLoggingInstance<IReaderService>();
+            this.logger = LoggerExtensions.TestLoggingInstance<ILibraryStaffService>();
         }
 
         /// <summary>
@@ -55,8 +50,8 @@ namespace LibraryBLTests
         [SetUp]
         public void Setup()
         {
-            this.repositoryMock = new Mock<IReaderRepository>();
-            this.service = new ReaderService(this.repositoryMock.Object, this.logger);
+            this.repositoryMock = new Mock<ILibraryStaffRepository>();
+            this.service = new LibraryStaffService(this.repositoryMock.Object, this.logger);
         }
 
         /// <summary>
@@ -68,6 +63,7 @@ namespace LibraryBLTests
             Assert.That(this.service, Is.Not.Null);
             Assert.Pass();
         }
+
 
         /// <summary>
         /// The Insert_NullArgumentException_Test.
@@ -86,7 +82,7 @@ namespace LibraryBLTests
         [Test]
         public void Insert_InvalidEntity_Test()
         {
-            var result = this.service.Insert(new Reader());
+            var result = this.service.Insert(new LibraryStaff());
             Assert.That(result.IsValid, Is.EqualTo(false));
             Assert.Pass();
         }
@@ -97,9 +93,9 @@ namespace LibraryBLTests
         [Test]
         public void Insert_Success_Test()
         {
-            var result = this.service.Insert(new Reader() { UserId = 1 });
+            var result = this.service.Insert(new LibraryStaff() { UserId = 1, User = new User() });
             Assert.That(result.IsValid, Is.EqualTo(true));
-            this.repositoryMock.Verify(i => i.Insert(It.IsAny<Reader>()), Times.Once);
+            this.repositoryMock.Verify(i => i.Insert(It.IsAny<LibraryStaff>()), Times.Once);
             Assert.Pass();
         }
 
@@ -109,16 +105,10 @@ namespace LibraryBLTests
         [Test]
         public void Update_Success_Test()
         {
-            var result = this.service.Update(
-                new Reader()
-                {
-                    UserId = 1,
-                    User = new User(),
-                    ReaderLoans = new List<ReaderLoan>()
-                });
+            var result = this.service.Update(new LibraryStaff() { UserId = 1 });
 
             Assert.That(result.IsValid, Is.EqualTo(true));
-            this.repositoryMock.Verify(i => i.Update(It.IsAny<Reader>()), Times.Once);
+            this.repositoryMock.Verify(i => i.Update(It.IsAny<LibraryStaff>()), Times.Once);
             Assert.Pass();
         }
 
@@ -128,7 +118,7 @@ namespace LibraryBLTests
         [Test]
         public void GetAll_Test()
         {
-            this.SetUpGetReader(new List<Reader>() { new Reader() });
+            this.SetUpGetLibraryStaff(new List<LibraryStaff>() { new LibraryStaff() });
 
             var result = this.service.GetAll();
             Assert.That(result, Is.Not.Null);
@@ -137,13 +127,14 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The SetUpGetReader.
+        /// The SetUpGetLibraryStaff.
         /// </summary>
-        /// <param name="readers">The readers<see cref="List{Reader}"/>.</param>
-        private void SetUpGetReader(List<Reader> readers)
+        /// <param name="libraryStaffs">The libraryStaffs<see cref="List{LibraryStaff}"/>.</param>
+        private void SetUpGetLibraryStaff(List<LibraryStaff> libraryStaffs)
         {
-            this.repositoryMock.Setup(i => i.Get(It.IsAny<Expression<Func<Reader, bool>>>(), It.IsAny<Func<IQueryable<Reader>, IOrderedQueryable<Reader>>>(), It.IsAny<string>()))
-                .Returns(readers);
+            this.repositoryMock.Setup(i => i.Get(It.IsAny<Expression<Func<LibraryStaff, bool>>>(), It.IsAny<Func<IQueryable<LibraryStaff>, IOrderedQueryable<LibraryStaff>>>(), It.IsAny<string>()))
+                .Returns(libraryStaffs);
         }
+
     }
 }
