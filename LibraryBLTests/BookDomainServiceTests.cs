@@ -60,7 +60,9 @@ namespace LibraryBLTests
         public BookDomain NewBookDomain => new BookDomain()
         {
             BookId = 1,
-            DomainId = 2
+            DomainId = 2,
+            Book = new Book(),
+            Domain = new Domain()
         };
 
         /// <summary>

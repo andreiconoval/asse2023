@@ -106,7 +106,9 @@ namespace LibraryBLTests
             var domain = new Domain()
             {
                 DomainName = "DomainName",
-                DomainId = 2
+                DomainId = 2,
+                ParentDomain = new Domain(),
+                Subdomains = new List<Domain>()
             };
 
             this.SetUpGetDomain(new List<Domain>() { domain });

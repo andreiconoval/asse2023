@@ -9,12 +9,10 @@ namespace Library.DAL.DomainModel
 {
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Defines the <see cref="LibraryStaff" />.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public class LibraryStaff
     {
         /// <summary>

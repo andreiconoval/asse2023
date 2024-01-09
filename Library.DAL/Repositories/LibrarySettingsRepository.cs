@@ -5,15 +5,19 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+
 namespace Library.DAL.Repositories
 {
     using Library.DAL.DataMapper;
     using Library.DAL.DomainModel;
     using Library.DAL.Interfaces;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Defines the <see cref="LibrarySettingsRepository" />.
     /// </summary>
+
+    [ExcludeFromCodeCoverage]
     public class LibrarySettingsRepository : ILibrarySettingsRepository
     {
         /// <summary>

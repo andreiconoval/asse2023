@@ -65,7 +65,9 @@ namespace LibraryBLTests
         private BookAuthor NewBookAuthor => new BookAuthor()
         {
             BookId = 1,
-            AuthorId = 1
+            AuthorId = 1,
+            Author = new Author(),
+            Book = new Book()
         };
 
         /// <summary>

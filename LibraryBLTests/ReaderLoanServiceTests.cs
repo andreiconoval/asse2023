@@ -152,11 +152,11 @@ namespace LibraryBLTests
             this.librarySettingsRepositoryMock.Setup(x => x.Get()).Returns(this.librarySettings);
             this.librarySettingsService = new LibrarySettingsService(this.librarySettingsRepositoryMock.Object);
             this.readerLoanService = new ReaderLoanService(
-                this.readerLoanRepositoryMock.Object, 
+                this.readerLoanRepositoryMock.Object,
                 this.bookLoanDetailRepositoryMock.Object,
-                this.bookSampleRepositoryMock.Object, 
-                this.librarySettingsService, 
-                this.userRepositoryMock.Object, 
+                this.bookSampleRepositoryMock.Object,
+                this.librarySettingsService,
+                this.userRepositoryMock.Object,
                 this.logger);
         }
 
@@ -210,7 +210,8 @@ namespace LibraryBLTests
                         ReaderLoanId = 401,
                         LoanDate = DateTime.Now,
                         ExpectedReturnDate = DateTime.Now.AddDays(14),
-                        EffectiveReturnDate = null
+                        EffectiveReturnDate = null,
+                        ReaderLoan = null
                     }
                 }
             };
