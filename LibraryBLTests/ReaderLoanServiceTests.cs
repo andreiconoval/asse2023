@@ -12,6 +12,7 @@ namespace LibraryBLTests
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Net;
     using FluentValidation;
     using Library.BL.Infrastructure;
     using Library.BL.Interfaces;
@@ -53,9 +54,9 @@ namespace LibraryBLTests
         private Mock<ILibrarySettingsRepository> librarySettingsRepositoryMock;
 
         /// <summary>
-        /// Defines the librarySettingsService.
+        /// Defines the librarySettingsServiceMock.
         /// </summary>
-        private ILibrarySettingsService librarySettingsService;
+        private Mock<ILibrarySettingsService> librarySettingsServiceMock;
 
         /// <summary>
         /// Defines the readerLoanService.
@@ -150,12 +151,12 @@ namespace LibraryBLTests
             this.userRepositoryMock = new Mock<IUserRepository>();
             this.librarySettingsRepositoryMock = new Mock<ILibrarySettingsRepository>();
             this.librarySettingsRepositoryMock.Setup(x => x.Get()).Returns(this.librarySettings);
-            this.librarySettingsService = new LibrarySettingsService(this.librarySettingsRepositoryMock.Object);
+            this.librarySettingsServiceMock = new Mock<ILibrarySettingsService>();
             this.readerLoanService = new ReaderLoanService(
                 this.readerLoanRepositoryMock.Object,
                 this.bookLoanDetailRepositoryMock.Object,
                 this.bookSampleRepositoryMock.Object,
-                this.librarySettingsService,
+                this.librarySettingsServiceMock.Object,
                 this.userRepositoryMock.Object,
                 this.logger);
         }
@@ -443,6 +444,150 @@ namespace LibraryBLTests
         }
 
         /// <summary>
+        /// The Insert_BookLoanDetailInvalid_Test.
+        /// </summary>
+        [Test]
+        public void Insert_BookLoanDetailInvalid_Test()
+        {
+            this.UserRepoGetSetup(new List<User>
+            {
+                new User { Id = 1, Email = "test@email.com", Reader = new Reader()},
+                new User { Id = 2, Email = "test@email.com", LibraryStaff = new LibraryStaff()}
+            });
+            var bookLoanDetail1 = new BookLoanDetail
+            {
+                Id = 1,
+            };
+
+            var readerLoan = new ReaderLoan
+            {
+                StaffId = 2,
+                ReaderId = 1,
+                LoanDate = new DateTime(),
+                BorrowedBooks = 1,
+                BookLoanDetails = new List<BookLoanDetail>() { bookLoanDetail1 }
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.Insert(readerLoan));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book loan detail, entity is invalid"));
+            Assert.Pass();
+        }
+
+
+        /// <summary>
+        /// The Insert_BookSampleNotExist_Test.
+        /// </summary>
+        [Test]
+        public void Insert_BookSampleNotExist_Test()
+        {
+            this.UserRepoGetSetup(new List<User>
+            {
+                new User { Id = 1, Email = "test@email.com", Reader = new Reader()},
+                new User { Id = 2, Email = "test@email.com", LibraryStaff = new LibraryStaff()}
+            });
+            var bookLoanDetail1 = new BookLoanDetail
+            {
+                Id = 1,
+                BookSampleId = 101,
+                BookEditionId = 201,
+                BookId = 301,
+                ReaderLoanId = 401,
+                LoanDate = DateTime.Now,
+                ExpectedReturnDate = DateTime.Now.AddDays(14),
+                EffectiveReturnDate = null
+            };
+
+            var readerLoan = new ReaderLoan
+            {
+                StaffId = 2,
+                ReaderId = 1,
+                LoanDate = new DateTime(),
+                BorrowedBooks = 1,
+                BookLoanDetails = new List<BookLoanDetail>() { bookLoanDetail1 }
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.Insert(readerLoan));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book loan detail, bookSample is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The Insert_CanntBorrowBooks_Test.
+        /// </summary>
+        [Test]
+        public void Insert_CannotBorrowBooks_Test()
+        {
+            this.UserRepoGetSetup(new List<User>
+            {
+                new User { Id = 1, Email = "test@email.com", Reader = new Reader()},
+                new User { Id = 2, Email = "test@email.com", LibraryStaff = new LibraryStaff()}
+            });
+
+            this.BookSampleRepoGetSetup(new List<BookSample>
+            {
+                new BookSample { Id = 101, BookEditionId = 201, AvailableForLoan = true, BookEdition= new BookEdition() }
+            });
+
+            this.librarySettingsServiceMock.Setup(i => i.CheckIfUserCanBorrowBooks(It.IsAny<User>(), It.IsAny<ReaderLoan>(), It.IsAny<List<ReaderLoan>>(), It.IsAny<int>()))
+                .Throws(new Exception("User cannot borrow book because of the rules"));
+
+
+            var bookLoanDetail1 = new BookLoanDetail
+            {
+                Id = 1,
+                BookSampleId = 101,
+                BookEditionId = 201,
+                BookId = 301,
+                ReaderLoanId = 401,
+                LoanDate = DateTime.Now,
+                ExpectedReturnDate = DateTime.Now.AddDays(14),
+                EffectiveReturnDate = null
+            };
+            var readerLoan = new ReaderLoan
+            {
+                StaffId = 2,
+                ReaderId = 1,
+                LoanDate = new DateTime(),
+                BorrowedBooks = 1,
+                BookLoanDetails = new List<BookLoanDetail>() { bookLoanDetail1 }
+            };
+
+            var ex = Assert.Throws<Exception>(() => this.readerLoanService.Insert(readerLoan));
+            Assert.That(ex.Message, Is.EqualTo("User cannot borrow book because of the rules"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The Insert_NoBookLoanDetails_Test.
+        /// </summary>
+        [Test]
+        public void Insert_NoBookLoanDetails_Test()
+        {
+            this.UserRepoGetSetup(new List<User>
+            {
+                new User { Id = 1, Email = "test@email.com", Reader = new Reader()},
+                new User { Id = 2, Email = "test@email.com", LibraryStaff = new LibraryStaff()}
+            });
+
+            this.BookSampleRepoGetSetup(new List<BookSample>
+            {
+                new BookSample { Id = 101, BookEditionId = 201, AvailableForLoan = true, BookEdition= new BookEdition() }
+            });
+            var readerLoan = new ReaderLoan
+            {
+                StaffId = 2,
+                ReaderId = 1,
+                LoanDate = new DateTime(),
+                BorrowedBooks = 0,
+                BookLoanDetails = null
+            };
+
+            var result = this.readerLoanService.Insert(readerLoan);
+            Assert.That(result, Is.Not.Null);
+            Assert.Pass();
+        }
+
+        /// <summary>
         /// The Insert_Success_Test.
         /// </summary>
         [Test]
@@ -454,19 +599,180 @@ namespace LibraryBLTests
                 new User { Id = 2, Email = "test@email.com", LibraryStaff = new LibraryStaff()}
             });
 
+            this.BookSampleRepoGetSetup(new List<BookSample>
+            {
+                new BookSample { Id = 101, BookEditionId = 201, AvailableForLoan = true, BookEdition= new BookEdition() }
+            });
+
+            var bookLoanDetail1 = new BookLoanDetail
+            {
+                Id = 1,
+                BookSampleId = 101,
+                BookEditionId = 201,
+                BookId = 301,
+                ReaderLoanId = 401,
+                LoanDate = DateTime.Now,
+                ExpectedReturnDate = DateTime.Now.AddDays(14),
+                EffectiveReturnDate = null
+            };
             var readerLoan = new ReaderLoan
             {
                 StaffId = 2,
                 ReaderId = 1,
                 LoanDate = new DateTime(),
-                BorrowedBooks = 0,
-                BookLoanDetails = new List<BookLoanDetail>()
+                BorrowedBooks = 1,
+                BookLoanDetails = new List<BookLoanDetail>() { bookLoanDetail1 }
             };
 
-            var result =  this.readerLoanService.Insert(readerLoan);
+            var result = this.readerLoanService.Insert(readerLoan);
             Assert.That(result, Is.Not.Null);
             Assert.Pass();
         }
+
+        /// <summary>
+        /// The ReturnBooks_InvalidReaderLoanId_Test.
+        /// </summary>
+        [Test]
+        public void ReturnBooks_InvalidReaderLoanId_Test()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.ReturnBooks(1));
+            Assert.That(ex.Message, Is.EqualTo("Cannot return books, loan is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The ReturnBooks_NoLoanBook_Test.
+        /// </summary>
+        [Test]
+        public void ReturnBooks_NoLoanBook_Test()
+        {
+            this.ReaderLoanRepoGetSetup(new List<ReaderLoan>
+            {
+                new ReaderLoan { Id = 1}
+            });
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.ReturnBooks(1));
+            Assert.That(ex.Message, Is.EqualTo("Cannot return books, loan doesn't have any books"));
+            Assert.Pass();
+        }
+
+
+        /// <summary>
+        /// The ReturnBooks_Succes_Test.
+        /// </summary>
+        [Test]
+        public void ReturnBooks_Succes_Test()
+        {
+            this.ReaderLoanRepoGetSetup(new List<ReaderLoan>
+            {
+                new ReaderLoan {
+                    Id = 1,
+                    BookLoanDetails = new List<BookLoanDetail>
+                    {
+                        new BookLoanDetail { EffectiveReturnDate = new DateTime(2000,1,1)},
+                        new BookLoanDetail ()
+                    }
+            }});
+
+            this.readerLoanService.ReturnBooks(1);
+            bookLoanDetailRepositoryMock.Verify(i => i.Update(It.IsAny<BookLoanDetail>()), Times.Once);
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The ReturnBook_InvalidReaderLoanId_Test.
+        /// </summary>
+        [Test]
+        public void ReturnBook_InvalidReaderLoanId_Test()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.ReturnBook(1, 1));
+            Assert.That(ex.Message, Is.EqualTo("Cannot return book, loan is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The ReturnBook_NoLoanBook_Test.
+        /// </summary>
+        [Test]
+        public void ReturnBook_NoLoanBook_Test()
+        {
+            this.ReaderLoanRepoGetSetup(new List<ReaderLoan>
+            {
+                new ReaderLoan { Id = 1}
+            });
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.ReturnBook(1, 1));
+            Assert.That(ex.Message, Is.EqualTo("Cannot return book, loan doesn't have any books"));
+            Assert.Pass();
+        }
+
+
+        /// <summary>
+        /// The ReturnBook_BookIsNotBorrowed_Test.
+        /// </summary>
+        [Test]
+        public void ReturnBook_BookIsNotBorrowed_Test()
+        {
+            this.ReaderLoanRepoGetSetup(new List<ReaderLoan>
+            {
+                new ReaderLoan {
+                    Id = 1,
+                    BookLoanDetails = new List<BookLoanDetail>
+                    {
+                        new BookLoanDetail { BookId = 1, EffectiveReturnDate = new DateTime(2000,1,1)},
+                        new BookLoanDetail { BookId = 2 }
+                    }
+            }});
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.ReturnBook(1, 3));
+            Assert.That(ex.Message, Is.EqualTo("Cannot return book, book is not present in current loan"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The ReturnBook_BookIsAlreadyReturned_Test.
+        /// </summary>
+        [Test]
+        public void ReturnBook_BookIsAlreadyReturned_Test()
+        {
+            this.ReaderLoanRepoGetSetup(new List<ReaderLoan>
+            {
+                new ReaderLoan {
+                    Id = 1,
+                    BookLoanDetails = new List<BookLoanDetail>
+                    {
+                        new BookLoanDetail { BookId = 1, EffectiveReturnDate = new DateTime(2000,1,1)},
+                        new BookLoanDetail { BookId = 2 }
+                    }
+            }});
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.ReturnBook(1, 1));
+            Assert.That(ex.Message, Is.EqualTo("Cannot return book, book is already returned"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The ReturnBook_Success_Test.
+        /// </summary>
+        [Test]
+        public void ReturnBook_Success_Test()
+        {
+            this.ReaderLoanRepoGetSetup(new List<ReaderLoan>
+            {
+                new ReaderLoan {
+                    Id = 1,
+                    BookLoanDetails = new List<BookLoanDetail>
+                    {
+                        new BookLoanDetail { BookId = 1, EffectiveReturnDate = new DateTime(2000,1,1)},
+                        new BookLoanDetail { BookId = 2 }
+                    }
+            }});
+
+            this.readerLoanService.ReturnBook(1, 2);
+            bookLoanDetailRepositoryMock.Verify(i => i.Update(It.IsAny<BookLoanDetail>()), Times.Once);
+            Assert.Pass();
+        }
+
 
         /// <summary>
         /// The UserRepoGetSetup.
@@ -493,6 +799,61 @@ namespace LibraryBLTests
                     }
 
                     return users.AsQueryable();
+                });
+        }
+
+        /// <summary>
+        /// The BookSampleRepoGetSetup.
+        /// </summary>
+        /// <param name="newBookSamples">The newBookSamples<see cref="List{BookSample}"/>.</param>
+        private void BookSampleRepoGetSetup(List<BookSample> newBookSamples)
+        {
+            this.bookSampleRepositoryMock.Setup(x => x.Get(
+                It.IsAny<Expression<Func<BookSample, bool>>>(),
+                It.IsAny<Func<IQueryable<BookSample>, IOrderedQueryable<BookSample>>>(),
+                It.IsAny<string>()))
+                .Returns<Expression<Func<BookSample, bool>>, Func<IQueryable<BookSample>, IOrderedQueryable<BookSample>>, string>((filter, orderBy, includeProperties) =>
+                {
+                    var bookSamples = newBookSamples;
+
+                    if (filter != null)
+                    {
+                        bookSamples = bookSamples.Where(filter.Compile()).ToList();
+                    }
+
+                    if (orderBy != null)
+                    {
+                        bookSamples = orderBy(bookSamples.AsQueryable()).ToList();
+                    }
+
+                    return bookSamples.AsQueryable();
+                });
+        }
+
+
+        /// <summary>
+        /// The ReaderLoanRepoGetSetup.
+        /// </summary>
+        /// <param name="readerLoans">The readerLoans<see cref="List{ReaderLoan}"/>.</param>
+        private void ReaderLoanRepoGetSetup(List<ReaderLoan> readerLoans)
+        {
+            this.readerLoanRepositoryMock.Setup(x => x.Get(
+                It.IsAny<Expression<Func<ReaderLoan, bool>>>(),
+                It.IsAny<Func<IQueryable<ReaderLoan>, IOrderedQueryable<ReaderLoan>>>(),
+                It.IsAny<string>()))
+                .Returns<Expression<Func<ReaderLoan, bool>>, Func<IQueryable<ReaderLoan>, IOrderedQueryable<ReaderLoan>>, string>((filter, orderBy, includeProperties) =>
+                {
+                    if (filter != null)
+                    {
+                        readerLoans = readerLoans.Where(filter.Compile()).ToList();
+                    }
+
+                    if (orderBy != null)
+                    {
+                        readerLoans = orderBy(readerLoans.AsQueryable()).ToList();
+                    }
+
+                    return readerLoans.AsQueryable();
                 });
         }
     }

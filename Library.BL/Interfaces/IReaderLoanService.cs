@@ -20,5 +20,24 @@ namespace Library.BL.Interfaces
         /// <param name="loan">The reader loan to insert.</param>
         /// <returns>The inserted reader loan.</returns>
         ReaderLoan Insert(ReaderLoan loan);
+
+        /// <summary>
+        /// Extend Book loan details period from Now.
+        /// </summary>
+        /// <param name="bookLoanDetailId"> Book loan detail id.</param>
+        void SetExtensionsForLoan(int bookLoanDetailId);
+
+        /// <summary>
+        /// Mark reader loan as returned for all book.
+        /// </summary>
+        /// <param name="readerLoanId"> Reader loan id.</param>
+        void ReturnBooks(int readerLoanId);
+
+        /// <summary>
+        /// Mark reader loan as returned for book.
+        /// </summary>
+        /// <param name="readerLoanId"> Reader loan id.</param>
+        /// <param name="bookId"> Book id.</param>
+        void ReturnBook(int readerLoanId, int bookId);
     }
 }
