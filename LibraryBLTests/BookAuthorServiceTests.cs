@@ -104,12 +104,23 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The Insert_InvalidEntity_Test.
+        /// The Insert_InvalidEntity_AuthorIdInvalid_Test.
         /// </summary>
         [Test]
-        public void Insert_InvalidEntity_Test()
+        public void Insert_InvalidEntity_AuthorIdInvalid_Test()
         {
-            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(new BookAuthor()));
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(new BookAuthor() { BookId = 1 }));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add book author, invalid entity"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The Insert_InvalidEntity_BookIdInvalid_Test.
+        /// </summary>
+        [Test]
+        public void Insert_InvalidEntity_BookIdInvalid_Test()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(new BookAuthor() { AuthorId = 1 }));
             Assert.That(ex.Message, Is.EqualTo("Cannot add book author, invalid entity"));
             Assert.Pass();
         }

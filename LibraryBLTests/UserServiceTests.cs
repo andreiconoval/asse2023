@@ -102,11 +102,151 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The AddUser_InvalidAuthor_Test.
+        /// The AddUser_InvalidAuthor_FirstName_Test.
         /// </summary>
         [Test]
-        public void AddUser_InvalidAuthor_Test()
+        public void AddUser_InvalidAuthor_FirstName_Test()
         {
+            var user = new User()
+            {
+                LastName = "LastName",
+                Address = "Address",
+                Phone = "000000",
+                Email = "Email"
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.userService.AddUser(user));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add user, invalid entity"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddUser_InvalidAuthor_FirstNameTooLong_Test.
+        /// </summary>
+        [Test]
+        public void AddUser_InvalidAuthor_FirstNameTooLong_Test()
+        {
+            var user = new User()
+            {
+                FirstName = new string('1', 256),
+                LastName = "LastName",
+                Address = "Address",
+                Phone = "000000",
+                Email = "Email"
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.userService.AddUser(user));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add user, invalid entity"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddUser_InvalidAuthor_LastName_Test.
+        /// </summary>
+        [Test]
+        public void AddUser_InvalidAuthor_LastName_Test()
+        {
+            var user = new User()
+            {
+                FirstName = "FirstName",
+                Address = "Address",
+                Phone = "000000",
+                Email = "Email"
+            };
+            var ex = Assert.Throws<ArgumentException>(() => this.userService.AddUser(new User()));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add user, invalid entity"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddUser_InvalidAuthor_LastNameTooLong_Test.
+        /// </summary>
+        [Test]
+        public void AddUser_InvalidAuthor_LastNameTooLong_Test()
+        {
+            var user = new User()
+            {
+                FirstName = "FirstName",
+                LastName = new string('1', 256),
+                Address = "Address",
+                Phone = "000000",
+                Email = "Email"
+            };
+            var ex = Assert.Throws<ArgumentException>(() => this.userService.AddUser(new User()));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add user, invalid entity"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddUser_InvalidAuthor_Address_Test.
+        /// </summary>
+        [Test]
+        public void AddUser_InvalidAuthor_Address_Test()
+        {
+            var user = new User()
+            {
+                FirstName = "FirstName",
+                LastName = "LastName",
+                Phone = "000000",
+                Email = "Email"
+            };
+            var ex = Assert.Throws<ArgumentException>(() => this.userService.AddUser(new User()));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add user, invalid entity"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddUser_InvalidAuthor_AddressTooLong_Test.
+        /// </summary>
+        [Test]
+        public void AddUser_InvalidAuthor_AddressTooLong_Test()
+        {
+            var user = new User()
+            {
+                FirstName = "FirstName",
+                LastName = "LastName",
+                Address = new string('1', 256),
+                Phone = "000000",
+                Email = "Email"
+            };
+            var ex = Assert.Throws<ArgumentException>(() => this.userService.AddUser(new User()));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add user, invalid entity"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddUser_InvalidAuthor_PhoneTooLong_Test.
+        /// </summary>
+        [Test]
+        public void AddUser_InvalidAuthor_PhoneTooLong_Test()
+        {
+            var user = new User()
+            {
+                FirstName = "FirstName",
+                LastName = "LastName",
+                Phone = new string('1', 16),
+                Address = "Address",
+                Email = "Email"
+            };
+            var ex = Assert.Throws<ArgumentException>(() => this.userService.AddUser(new User()));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add user, invalid entity"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddUser_InvalidAuthor_EmailTooLong_Test.
+        /// </summary>
+        [Test]
+        public void AddUser_InvalidAuthor_EmailTooLong_Test()
+        {
+            var user = new User()
+            {
+                FirstName = "FirstName",
+                LastName = "LastName",
+                Phone = new string('1', 14),
+                Address = "Address",
+                Email = new string('1', 256)
+            };
             var ex = Assert.Throws<ArgumentException>(() => this.userService.AddUser(new User()));
             Assert.That(ex.Message, Is.EqualTo("Cannot add user, invalid entity"));
             Assert.Pass();

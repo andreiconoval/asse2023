@@ -87,12 +87,77 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The AddDomain_InvalidEntity_Test.
+        /// The AddDomain_InvalidDomainId_Test.
         /// </summary>
         [Test]
-        public void AddDomain_InvalidEntity_Test()
+        public void AddDomain_InvalidDomainId_Test()
         {
-            var ex = Assert.Throws<ArgumentException>(() => this.domainService.Insert(new Domain()));
+            var ex = Assert.Throws<ArgumentException>(() => this.domainService.Insert(new Domain() { DomainName = "DomainName" }));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new domain, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddDomain_InvalidDomainIdEqualToId_Test.
+        /// </summary>
+        [Test]
+        public void AddDomain_InvalidDomainIdEqualToId_Test()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => this.domainService.Insert(new Domain() { DomainName = "DomainName", DomainId = 1, Id = 1 }));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new domain, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddDomain_InvalidDomainName_Test.
+        /// </summary>
+        [Test]
+        public void AddDomain_InvalidDomainName_Test()
+        {
+            var domain = new Domain
+            {
+                DomainName = "",
+                DomainId = 1,
+                Id = 1
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.domainService.Insert(domain));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new domain, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddDomain_InvalidDomainNameTooShort_Test.
+        /// </summary>
+        [Test]
+        public void AddDomain_InvalidDomainNameTooShort_Test()
+        {
+            var domain = new Domain
+            {
+                DomainName = "12",
+                DomainId = 1,
+                Id = 1
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.domainService.Insert(domain));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new domain, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddDomain_InvalidDomainNameTooLong_Test.
+        /// </summary>
+        [Test]
+        public void AddDomain_InvalidDomainNameTooLong_Test()
+        {
+            var domain = new Domain
+            {
+                DomainName = new string('1', 256),
+                DomainId = 1,
+                Id = 1
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.domainService.Insert(domain));
             Assert.That(ex.Message, Is.EqualTo("Cannot add new domain, entity is invalid"));
             Assert.Pass();
         }

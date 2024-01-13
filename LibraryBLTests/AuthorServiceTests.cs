@@ -170,9 +170,20 @@ namespace LibraryBLTests
         /// The AddAuthor_InvalidAuthor_Test.
         /// </summary>
         [Test]
-        public void AddAuthor_InvalidAuthor_Test()
+        public void AddAuthor_InvalidAuthor_FirstNameInvalid_Test()
         {
             var ex = Assert.Throws<ArgumentException>(() => this.authorService.AddAuthor(new Author()));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add author, invalid entity"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddAuthor_InvalidAuthor_Test.
+        /// </summary>
+        [Test]
+        public void AddAuthor_InvalidAuthor_LastNameInvalid_Test()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => this.authorService.AddAuthor(new Author() { FirstName = "FirstName" }));
             Assert.That(ex.Message, Is.EqualTo("Cannot add author, invalid entity"));
             Assert.Pass();
         }

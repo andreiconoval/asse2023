@@ -98,12 +98,23 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The AddBookDomain_InvalidEntity_Test.
+        /// The AddBookDomain_InvalidEntity_DomainId_Test.
         /// </summary>
         [Test]
-        public void AddBookDomain_InvalidEntity_Test()
+        public void AddBookDomain_InvalidEntity_DomainId_Test()
         {
-            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(new BookDomain()));
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(new BookDomain() { BookId = 1 }));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add book domain, invalid entity"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddBookDomain_InvalidEntity_BookId_Test.
+        /// </summary>
+        [Test]
+        public void AddBookDomain_InvalidEntity_BookId_Test()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(new BookDomain() { DomainId = 1 }));
             Assert.That(ex.Message, Is.EqualTo("Cannot add book domain, invalid entity"));
             Assert.Pass();
         }
@@ -140,10 +151,6 @@ namespace LibraryBLTests
         [Test]
         public void AddBookDomain_Success_Test()
         {
-            var bookDomains = new List<BookDomain>()
-            {
-                new BookDomain { BookId = 1, DomainId = 1 }
-            };
             var domains = new List<Domain>()
             {
                 new Domain { Id = 2, DomainId = 1 },

@@ -124,5 +124,25 @@ namespace Library.BL.Services
                 throw new ArgumentException("Reader exceed limit for today");
             }
         }
+
+        /// <summary>
+        /// Checks if a user can extend time for loan.
+        /// </summary>
+        /// <param name="user">The user to check.</param>
+        /// <param name="totalExtensionsInLastThreeMonths">The total extensions in last three months.</param>
+        public bool CheckIfUserCanExtendForLoan(User user, int totalExtensionsInLastThreeMonths)
+        {
+            if (user.LibraryStaff == null)
+            {
+                USER_IND = 2;
+            }
+            else
+            {
+                USER_IND = 1;
+            }
+
+            // Verificare limita LIM pentru prelungiri
+            return totalExtensionsInLastThreeMonths < this.LIM;
+        }
     }
 }

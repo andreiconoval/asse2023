@@ -55,7 +55,7 @@ namespace Library.BL.Services
             {
                 var result = Validator.Validate(bookAuthor);
 
-                if (bookAuthor == null || !result.IsValid)
+                if (!result.IsValid)
                 {
                     throw new ArgumentException("Cannot add book author, invalid entity");
                 }

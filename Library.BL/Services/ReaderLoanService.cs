@@ -252,29 +252,31 @@ namespace Library.BL.Services
             try
             {
                 var bookLoanDetail = this.bookLoanDetailRepository.Get(bld => bld.Id == bookLoanDetailId, includeProperties: "ReaderLoan").FirstOrDefault();
-                if (bookLoanDetail == null)
+                if (bookLoanDetail == null || bookLoanDetail.ReaderLoan == null)
                 {
                     this.logger.LogInformation($"Cannot update book loan detail, book loan is invalid");
                     throw new ArgumentException("Cannot update book loan detail, book loan is invalid");
                 }
 
-                var previousLoans = this.readerLoanRepository.Get(u => bookLoanDetail.ReaderLoan != null && u.ReaderId == bookLoanDetail.ReaderLoan.ReaderId, includeProperties: "BookLoanDetails").ToList();
+                var previousLoans = this.readerLoanRepository.Get(u =>
+                        u.LoanDate >= DateTime.Now.AddMonths(-3) &&
+                        bookLoanDetail.ReaderLoan != null &&
+                        u.ReaderId == bookLoanDetail.ReaderLoan.ReaderId, includeProperties: "BookLoanDetails")
+                    .ToList();
 
                 // Verificare limita LIM pentru prelungiri
                 var totalExtensionsInLastThreeMonths = previousLoans.Sum(pl => pl.ExtensionsGranted);
-                if (totalExtensionsInLastThreeMonths + 1 > this.librarySettingsService.LIM)
+                var user = this.userRepository.Get(u => u.Id == bookLoanDetail.ReaderLoan.ReaderId).FirstOrDefault();
+
+                if (!this.librarySettingsService.CheckIfUserCanExtendForLoan(user, totalExtensionsInLastThreeMonths))
                 {
                     throw new ArgumentException("Exceeded maximum allowed extensions for borrowed books in the last three months.");
                 }
 
                 bookLoanDetail.ExpectedReturnDate = DateTime.Now;
+                bookLoanDetail.ReaderLoan.ExtensionsGranted += 1;
 
-                if (bookLoanDetail.ReaderLoan != null)
-                {
-                    bookLoanDetail.ReaderLoan.ExtensionsGranted += 1;
-                    this.readerLoanRepository.Update(bookLoanDetail.ReaderLoan);
-                }
-
+                this.readerLoanRepository.Update(bookLoanDetail.ReaderLoan);
                 this.bookLoanDetailRepository.Update(bookLoanDetail);
             }
             catch (Exception ex)

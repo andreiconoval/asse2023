@@ -83,5 +83,12 @@ namespace Library.BL.Interfaces
         /// <param name="previousLoans">A list of previous loans for the user.</param>
         /// <param name="staffLendCount">The staff lend count.</param>
         void CheckIfUserCanBorrowBooks(User user, ReaderLoan newLoan, List<ReaderLoan> previousLoans, int staffLendCount);
+
+        /// <summary>
+        /// Checks if a user can extend time for loan.
+        /// </summary>
+        /// <param name="user">The user to check.</param>
+        /// <param name="totalExtensionsInLastThreeMonths">The total extensions in last three months.</param>
+        bool CheckIfUserCanExtendForLoan(User user, int totalExtensionsInLastThreeMonths);
     }
 }

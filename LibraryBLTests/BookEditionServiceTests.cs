@@ -12,6 +12,7 @@ namespace LibraryBLTests
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Net;
     using Library.BL.Infrastructure;
     using Library.BL.Interfaces;
     using Library.BL.Services;
@@ -106,6 +107,104 @@ namespace LibraryBLTests
         public void AddBookEdition_InvalidEntity_Test()
         {
             var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(new BookEdition()));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book edition, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddBookEdition_InvalidBookId_Test.
+        /// </summary>
+        [Test]
+        public void AddBookEdition_InvalidBookId_Test()
+        {
+            var bookEdition = this.NewBookEdition;
+            bookEdition.BookId = 0;
+
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(bookEdition));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book edition, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddBookEdition_InvalidPageNumber_Test.
+        /// </summary>
+        [Test]
+        public void AddBookEdition_InvalidPageNumber_Test()
+        {
+            var bookEdition = this.NewBookEdition;
+            bookEdition.PageNumber = 0;
+
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(bookEdition));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book edition, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddBookEdition_InvalidBookType_Test.
+        /// </summary>
+        [Test]
+        public void AddBookEdition_InvalidBookType_Test()
+        {
+            var bookEdition = this.NewBookEdition;
+            bookEdition.BookType = "";
+
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(bookEdition));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book edition, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddBookEdition_InvalidBookTypeTooLong_Test.
+        /// </summary>
+        [Test]
+        public void AddBookEdition_InvalidBookTypeTooLong_Test()
+        {
+            var bookEdition = this.NewBookEdition;
+            bookEdition.BookType = new string('a', 256);
+
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(bookEdition));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book edition, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddBookEdition_InvalidEdition_Test.
+        /// </summary>
+        [Test]
+        public void AddBookEdition_InvalidEdition_Test()
+        {
+            var bookEdition = this.NewBookEdition;
+            bookEdition.Edition = "";
+
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(bookEdition));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book edition, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddBookEdition_InvalidEditionTooLong_Test.
+        /// </summary>
+        [Test]
+        public void AddBookEdition_InvalidEditionTooLong_Test()
+        {
+            var bookEdition = this.NewBookEdition;
+            bookEdition.Edition = new string('a', 256);
+
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(bookEdition));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book edition, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddBookEdition_InvalidReleaseYear_Test.
+        /// </summary>
+        [Test]
+        public void AddBookEdition_InvalidReleaseYear_Test()
+        {
+            var bookEdition = this.NewBookEdition;
+            bookEdition.ReleaseYear = -1;
+
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(bookEdition));
             Assert.That(ex.Message, Is.EqualTo("Cannot add new book edition, entity is invalid"));
             Assert.Pass();
         }

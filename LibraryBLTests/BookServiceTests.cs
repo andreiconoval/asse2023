@@ -102,12 +102,53 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The AddBook_InvalidEntity_Test.
+        /// The AddBook_InvalidEntity_YearPublication_Test.
         /// </summary>
         [Test]
-        public void AddBook_InvalidEntity_Test()
+        public void AddBook_InvalidEntity_YearPublication_Test()
         {
-            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(new Book()));
+            var book = new Book() { Title = "1234" };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(book));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddBook_InvalidEntity_Title_Test.
+        /// </summary>
+        [Test]
+        public void AddBook_InvalidEntity_Title_Test()
+        {
+            var book = new Book() { YearPublication = 1 };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(book));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddBook_InvalidEntity_TitleTooShort_Test.
+        /// </summary>
+        [Test]
+        public void AddBook_InvalidEntity_TitleTooShort_Test()
+        {
+            var book = new Book() { YearPublication = 1, Title = "12" };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(book));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddBook_InvalidEntity_TitleTooLong_Test.
+        /// </summary>
+        [Test]
+        public void AddBook_InvalidEntity_TitleTooLong_Test()
+        {
+            var book = new Book() { YearPublication = 1, Title = new string('1', 256) };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(book));
             Assert.That(ex.Message, Is.EqualTo("Cannot add new book, entity is invalid"));
             Assert.Pass();
         }

@@ -191,6 +191,80 @@ namespace LibraryBLTests
             Assert.Pass();
         }
 
+
+        /// <summary>
+        /// The Insert_MissingReaderId_Test.
+        /// </summary>
+        [Test]
+        public void Insert_MissingReaderId_Test()
+        {
+            var readerLoan = new ReaderLoan
+            {
+                StaffId = 1,
+                LoanDate = new DateTime(),
+                BorrowedBooks = 1
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.Insert(readerLoan));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new loan, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The Insert_MissingStaffId_Test.
+        /// </summary>
+        [Test]
+        public void Insert_MissingStaffId_Test()
+        {
+            var readerLoan = new ReaderLoan
+            {
+                ReaderId = 1,
+                LoanDate = new DateTime(),
+                BorrowedBooks = 1
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.Insert(readerLoan));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new loan, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The Insert_MissingLoanDate_Test.
+        /// </summary>
+        [Test]
+        public void Insert_MissingLoanDate_Test()
+        {
+            var readerLoan = new ReaderLoan
+            {
+                ReaderId = 1,
+                StaffId = 1,
+                BorrowedBooks = 1
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.Insert(readerLoan));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new loan, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The Insert_InvalidLoanDate_Test.
+        /// </summary>
+        [Test]
+        public void Insert_InvalidLoanDate_Test()
+        {
+            var readerLoan = new ReaderLoan
+            {
+                ReaderId = 1,
+                StaffId = 1,
+                BorrowedBooks = 1,
+                LoanDate = new DateTime(1999, 5, 13),
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.Insert(readerLoan));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new loan, entity is invalid"));
+            Assert.Pass();
+        }
+
         /// <summary>
         /// The Invalid_BookLoan_EmptyFields_Test.
         /// </summary>
@@ -531,7 +605,6 @@ namespace LibraryBLTests
             this.librarySettingsServiceMock.Setup(i => i.CheckIfUserCanBorrowBooks(It.IsAny<User>(), It.IsAny<ReaderLoan>(), It.IsAny<List<ReaderLoan>>(), It.IsAny<int>()))
                 .Throws(new Exception("User cannot borrow book because of the rules"));
 
-
             var bookLoanDetail1 = new BookLoanDetail
             {
                 Id = 1,
@@ -773,6 +846,94 @@ namespace LibraryBLTests
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The SetExtensionsForLoan_BookLoanInvalid_Test.
+        /// </summary>
+        [Test]
+        public void SetExtensionsForLoan_BookLoanInvalid_Test()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.SetExtensionsForLoan(1));
+            Assert.That(ex.Message, Is.EqualTo("Cannot update book loan detail, book loan is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The SetExtensionsForLoan_MaximumExtensionsExceded_Test.
+        /// </summary>
+        [Test]
+        public void SetExtensionsForLoan_MaximumExtensionsExceded_Test()
+        {
+            var bookLoanDetails = new List<BookLoanDetail>
+            {
+                new BookLoanDetail { Id = 1, BookId = 1, ReaderLoan = new ReaderLoan{ ReaderId = 1 } }
+            };
+
+            var bookLoans = new List<ReaderLoan>
+            {
+                new ReaderLoan {ReaderId = 1, ExtensionsGranted = 1, LoanDate = DateTime.Today.AddMonths(-2) },
+                new ReaderLoan {ReaderId = 1, ExtensionsGranted = 2, LoanDate = DateTime.Today.AddMonths(-2) }
+            };
+
+            this.RepoGetSetup<BookLoanDetail>(bookLoanDetails, this.bookLoanDetailRepositoryMock.As<IRepository<BookLoanDetail>>());
+            this.RepoGetSetup<ReaderLoan>(bookLoans, this.readerLoanRepositoryMock.As<IRepository<ReaderLoan>>());
+            this.librarySettingsServiceMock.Setup(i => i.CheckIfUserCanExtendForLoan(It.IsAny<User>(), 3)).Returns(false);
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.SetExtensionsForLoan(1));
+            Assert.That(ex.Message, Is.EqualTo("Exceeded maximum allowed extensions for borrowed books in the last three months."));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The SetExtensionsForLoan_MaximumExtensionsExceded2_Test.
+        /// </summary>
+        [Test]
+        public void SetExtensionsForLoan_MaximumExtensionsExceded2_Test()
+        {
+            var bookLoanDetails = new List<BookLoanDetail>
+            {
+                new BookLoanDetail { Id = 1, BookId = 1, ReaderLoan = new ReaderLoan{ ReaderId = 1 } }
+            };
+
+            var bookLoans = new List<ReaderLoan>
+            {
+                new ReaderLoan {ReaderId = 1, ExtensionsGranted = 4, LoanDate = DateTime.Today.AddMonths(-2) },
+                new ReaderLoan {ReaderId = 1, ExtensionsGranted = 2, LoanDate = DateTime.Today.AddMonths(-4) }
+            };
+
+            this.RepoGetSetup<BookLoanDetail>(bookLoanDetails, this.bookLoanDetailRepositoryMock.As<IRepository<BookLoanDetail>>());
+            this.RepoGetSetup<ReaderLoan>(bookLoans, this.readerLoanRepositoryMock.As<IRepository<ReaderLoan>>());
+            this.librarySettingsServiceMock.Setup(i => i.CheckIfUserCanExtendForLoan(It.IsAny<User>(), 1)).Returns(false);
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.SetExtensionsForLoan(1));
+            Assert.That(ex.Message, Is.EqualTo("Exceeded maximum allowed extensions for borrowed books in the last three months."));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The SetExtensionsForLoan_Success_Test.
+        /// </summary>
+        [Test]
+        public void SetExtensionsForLoan_Success_Test()
+        {
+            var bookLoanDetails = new List<BookLoanDetail>
+            {
+                new BookLoanDetail { Id = 1, BookId = 1, ReaderLoan = new ReaderLoan{ ReaderId = 1 } }
+            };
+
+            var bookLoans = new List<ReaderLoan>
+            {
+                new ReaderLoan {ReaderId = 1, ExtensionsGranted = 4, LoanDate = DateTime.Today.AddMonths(-2) },
+                new ReaderLoan {ReaderId = 1, ExtensionsGranted = 2, LoanDate = DateTime.Today.AddMonths(-4) }
+            };
+
+            this.RepoGetSetup<BookLoanDetail>(bookLoanDetails, this.bookLoanDetailRepositoryMock.As<IRepository<BookLoanDetail>>());
+            this.RepoGetSetup<ReaderLoan>(bookLoans, this.readerLoanRepositoryMock.As<IRepository<ReaderLoan>>());
+            this.librarySettingsServiceMock.Setup(i => i.CheckIfUserCanExtendForLoan(It.IsAny<User>(), 4)).Returns(true);
+
+            this.readerLoanService.SetExtensionsForLoan(1);
+            this.readerLoanRepositoryMock.Verify(i => i.Update(It.IsAny<ReaderLoan>()), Times.Once);
+            this.bookLoanDetailRepositoryMock.Verify(i => i.Update(It.IsAny<BookLoanDetail>()), Times.Once);
+        }
 
         /// <summary>
         /// The UserRepoGetSetup.
@@ -808,26 +969,7 @@ namespace LibraryBLTests
         /// <param name="newBookSamples">The newBookSamples<see cref="List{BookSample}"/>.</param>
         private void BookSampleRepoGetSetup(List<BookSample> newBookSamples)
         {
-            this.bookSampleRepositoryMock.Setup(x => x.Get(
-                It.IsAny<Expression<Func<BookSample, bool>>>(),
-                It.IsAny<Func<IQueryable<BookSample>, IOrderedQueryable<BookSample>>>(),
-                It.IsAny<string>()))
-                .Returns<Expression<Func<BookSample, bool>>, Func<IQueryable<BookSample>, IOrderedQueryable<BookSample>>, string>((filter, orderBy, includeProperties) =>
-                {
-                    var bookSamples = newBookSamples;
-
-                    if (filter != null)
-                    {
-                        bookSamples = bookSamples.Where(filter.Compile()).ToList();
-                    }
-
-                    if (orderBy != null)
-                    {
-                        bookSamples = orderBy(bookSamples.AsQueryable()).ToList();
-                    }
-
-                    return bookSamples.AsQueryable();
-                });
+            this.RepoGetSetup<BookSample>(newBookSamples, this.bookSampleRepositoryMock.As<IRepository<BookSample>>());
         }
 
 
@@ -837,23 +979,33 @@ namespace LibraryBLTests
         /// <param name="readerLoans">The readerLoans<see cref="List{ReaderLoan}"/>.</param>
         private void ReaderLoanRepoGetSetup(List<ReaderLoan> readerLoans)
         {
-            this.readerLoanRepositoryMock.Setup(x => x.Get(
-                It.IsAny<Expression<Func<ReaderLoan, bool>>>(),
-                It.IsAny<Func<IQueryable<ReaderLoan>, IOrderedQueryable<ReaderLoan>>>(),
+            this.RepoGetSetup<ReaderLoan>(readerLoans, this.readerLoanRepositoryMock.As<IRepository<ReaderLoan>>());
+        }
+
+        /// <summary>
+        /// The RepoGetSetup.
+        /// </summary>
+        /// <param name="entries">The entries<see cref="List{T}"/>.</param>
+        /// <param name="repo">The repository<see cref="Mock{IRepository{T}}"/>.</param>
+        private void RepoGetSetup<T>(List<T> entries, Mock<IRepository<T>> repo)
+        {
+            repo.Setup(x => x.Get(
+                It.IsAny<Expression<Func<T, bool>>>(),
+                It.IsAny<Func<IQueryable<T>, IOrderedQueryable<T>>>(),
                 It.IsAny<string>()))
-                .Returns<Expression<Func<ReaderLoan, bool>>, Func<IQueryable<ReaderLoan>, IOrderedQueryable<ReaderLoan>>, string>((filter, orderBy, includeProperties) =>
+                .Returns<Expression<Func<T, bool>>, Func<IQueryable<T>, IOrderedQueryable<T>>, string>((filter, orderBy, includeProperties) =>
                 {
                     if (filter != null)
                     {
-                        readerLoans = readerLoans.Where(filter.Compile()).ToList();
+                        entries = entries.Where(filter.Compile()).ToList();
                     }
 
                     if (orderBy != null)
                     {
-                        readerLoans = orderBy(readerLoans.AsQueryable()).ToList();
+                        entries = orderBy(entries.AsQueryable()).ToList();
                     }
 
-                    return readerLoans.AsQueryable();
+                    return entries.AsQueryable();
                 });
         }
     }
