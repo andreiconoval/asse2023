@@ -53,7 +53,7 @@ namespace Library.BL.Services
             {
                 var result = Validator.Validate(bookDomain);
 
-                if (bookDomain == null || !result.IsValid)
+                if (!result.IsValid)
                 {
                     Logger.LogInformation("Cannot add book domain, invalid entity");
                     throw new ArgumentException("Cannot add book domain, invalid entity");
@@ -96,11 +96,6 @@ namespace Library.BL.Services
         /// <returns>True if meet parent child relation.</returns>
         private bool IsDomainBookRelationValid(BookDomain newRelation, List<BookDomain> bookDomains, List<Domain> domains)
         {
-            if (newRelation is null)
-            {
-                return false;
-            }
-
             var domain = domains.Find(d => d.Id == newRelation.DomainId);
             if (domain == null)
             {
@@ -112,7 +107,7 @@ namespace Library.BL.Services
 
             foreach (var bookDomain in bookDomains)
             {
-                if (bookDomain == null || bookDomain.Domain == null || newDomainAncestor == this.GetDomainAncestor(bookDomain.Domain.Id, domains))
+                if (bookDomain.Domain == null || newDomainAncestor == this.GetDomainAncestor(bookDomain.Domain.Id, domains))
                 {
                     return true;
                 }

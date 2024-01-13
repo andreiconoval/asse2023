@@ -24,8 +24,8 @@ namespace Library.BL.Validators
             RuleFor(readerLoan => readerLoan.ReaderId).NotEmpty();
             RuleFor(readerLoan => readerLoan.StaffId).NotEmpty();
             RuleFor(readerLoan => readerLoan.LoanDate).NotEmpty().GreaterThanOrEqualTo(new DateTime(2000, 1, 15));
-            RuleFor(readerLoan => readerLoan.BorrowedBooks).NotEmpty();
-            RuleFor(readerLoan => readerLoan.BookLoanDetails).NotEmpty().Must((readerLoan, readerLoanDetails) => readerLoanDetails == null || readerLoanDetails.Count == readerLoan.BorrowedBooks);
+            RuleFor(readerLoan => readerLoan.BorrowedBooks).NotNull();
+            RuleFor(readerLoan => readerLoan.BookLoanDetails).Must((readerLoan, readerLoanDetails) => (readerLoan.BorrowedBooks == 0 && readerLoanDetails == null) || (readerLoanDetails != null && readerLoanDetails.Count == readerLoan.BorrowedBooks));
         }
     }
 }

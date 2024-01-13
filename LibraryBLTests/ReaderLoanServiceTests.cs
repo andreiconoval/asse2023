@@ -328,6 +328,146 @@ namespace LibraryBLTests
             Assert.Pass();
         }
 
+
+
+        /// <summary>
+        /// The Invalid_BookLoan_UserIsNotReader_Test.
+        /// </summary>
+        [Test]
+        public void Invalid_BookLoan_UserIsMissing_Test()
+        {
+            this.UserRepoGetSetup(new List<User>());
+
+            var readerLoan = new ReaderLoan
+            {
+                StaffId = 1,
+                ReaderId = 1,
+                LoanDate = new DateTime(),
+                BorrowedBooks = 1,
+                BookLoanDetails = new List<BookLoanDetail>
+                {
+                    new BookLoanDetail
+                    {
+                        Id = 1,
+                        BookSampleId = 101,
+                        BookEditionId = 201,
+                        BookId = 301,
+                        ReaderLoanId = 401,
+                        LoanDate = DateTime.Now,
+                        ExpectedReturnDate = DateTime.Now.AddDays(14),
+                        EffectiveReturnDate = null
+                    }
+                }
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.Insert(readerLoan));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new loan, reader is missing"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The Invalid_BookLoan_StaffIsMissing_Test.
+        /// </summary>
+        [Test]
+        public void Invalid_BookLoan_StaffIsMissing_Test()
+        {
+            this.UserRepoGetSetup(new List<User>
+            {
+                new User { Id = 1, Email = "test@email.com", Reader = new Reader()}
+            });
+
+            var readerLoan = new ReaderLoan
+            {
+                StaffId = 2,
+                ReaderId = 1,
+                LoanDate = new DateTime(),
+                BorrowedBooks = 1,
+                BookLoanDetails = new List<BookLoanDetail>
+                {
+                    new BookLoanDetail
+                    {
+                        Id = 1,
+                        BookSampleId = 101,
+                        BookEditionId = 201,
+                        BookId = 301,
+                        ReaderLoanId = 401,
+                        LoanDate = DateTime.Now,
+                        ExpectedReturnDate = DateTime.Now.AddDays(14),
+                        EffectiveReturnDate = null
+                    }
+                }
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.Insert(readerLoan));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new loan, staff is missing"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The Invalid_BookLoan_StaffIsMissing_Test.
+        /// </summary>
+        [Test]
+        public void Invalid_BookLoan_StaffIsMissingNull_Test()
+        {
+            this.UserRepoGetSetup(new List<User>
+            {
+                new User { Id = 1, Email = "test@email.com", Reader = new Reader()},
+                new User { Id = 2, Email = "test@email.com"}
+            });
+
+            var readerLoan = new ReaderLoan
+            {
+                StaffId = 2,
+                ReaderId = 1,
+                LoanDate = new DateTime(),
+                BorrowedBooks = 1,
+                BookLoanDetails = new List<BookLoanDetail>
+                {
+                    new BookLoanDetail
+                    {
+                        Id = 1,
+                        BookSampleId = 101,
+                        BookEditionId = 201,
+                        BookId = 301,
+                        ReaderLoanId = 401,
+                        LoanDate = DateTime.Now,
+                        ExpectedReturnDate = DateTime.Now.AddDays(14),
+                        EffectiveReturnDate = null
+                    }
+                }
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.Insert(readerLoan));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new loan, staff is missing"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The Insert_Success_Test.
+        /// </summary>
+        [Test]
+        public void Insert_Success_Test()
+        {
+            this.UserRepoGetSetup(new List<User>
+            {
+                new User { Id = 1, Email = "test@email.com", Reader = new Reader()},
+                new User { Id = 2, Email = "test@email.com", LibraryStaff = new LibraryStaff()}
+            });
+
+            var readerLoan = new ReaderLoan
+            {
+                StaffId = 2,
+                ReaderId = 1,
+                LoanDate = new DateTime(),
+                BorrowedBooks = 0,
+                BookLoanDetails = new List<BookLoanDetail>()
+            };
+
+            var result =  this.readerLoanService.Insert(readerLoan);
+            Assert.That(result, Is.Not.Null);
+            Assert.Pass();
+        }
+
         /// <summary>
         /// The UserRepoGetSetup.
         /// </summary>
