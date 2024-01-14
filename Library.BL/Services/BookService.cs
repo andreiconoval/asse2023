@@ -184,6 +184,11 @@ namespace Library.BL.Services
         /// <param name="book">Book entity.</param>
         public override void Delete(Book book)
         {
+            if (book == null)
+            {
+                throw new ArgumentException("Cannot delete book, book is missing");
+            }
+
             this.Delete(book, false);
         }
     }

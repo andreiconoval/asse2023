@@ -93,6 +93,21 @@ namespace Library.BL.Services
         }
 
         /// <summary>
+        /// The Delete.
+        /// </summary>
+        /// <param name="bookDomain">Book domain relation.</param>
+        /// <exception cref="ArgumentException">Argument exception</exception>
+        public override void Delete(BookDomain bookDomain)
+        {
+            if (bookDomain == null)
+            {
+                throw new ArgumentException("Cannot delete book domain, bookDomain is null");
+            }
+
+            base.Delete(bookDomain);
+        }
+
+        /// <summary>
         /// Check if new book domain doesn't have parent or is not aren't for existing domain.
         /// </summary>
         /// <param name="newRelation">New book domain relation.</param>

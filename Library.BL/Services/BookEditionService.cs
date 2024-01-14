@@ -134,6 +134,12 @@ namespace Library.BL.Services
         {
             try
             {
+                if (bookEdition == null)
+                {
+                    Logger.LogInformation("Cannot delete book edition, bookEdition is null");
+                    throw new ArgumentException("Cannot delete book edition, bookEdition is null");
+                }
+
                 var fullDatabaseBook = Repository.Get(i => i.Id == bookEdition.Id, null, "BookSamples").FirstOrDefault();
                 if (fullDatabaseBook == null)
                 {

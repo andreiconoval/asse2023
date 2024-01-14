@@ -120,6 +120,12 @@ namespace Library.BL.Services
         {
             try
             {
+                if (domain == null)
+                {
+                    Logger.LogInformation("Cannot delete domain, domain is missing");
+                    throw new ArgumentException("Cannot delete domain, domain is missing");
+                }
+
                 var fullDatabaseDomain = Repository.Get(i => i.Id == domain.Id, includeProperties: "BookDomains,Subdomains").FirstOrDefault();
                 if (fullDatabaseDomain == null)
                 {

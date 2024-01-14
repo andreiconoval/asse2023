@@ -272,6 +272,17 @@ namespace LibraryBLTests
         }
 
         /// <summary>
+        /// The DeleteBookDomain_BookDomainNull_Test.
+        /// </summary>
+        [Test]
+        public void DeleteBookDomain_BookDomainNull_Test()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Delete(null));
+            Assert.That(ex.Message, Is.EqualTo("Cannot delete book domain, bookDomain is null"));
+            Assert.Pass();
+        }
+
+        /// <summary>
         /// The SetUpGetBookDomain.
         /// </summary>
         /// <param name = "bookDomains">The bookDomains<see cref = "List{BookDomain}"/>.</param>

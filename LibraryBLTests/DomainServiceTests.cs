@@ -286,6 +286,18 @@ namespace LibraryBLTests
         }
 
         /// <summary>
+        /// The DeleteDomain_DomainNull_Test.
+        /// </summary>
+        [Test]
+        public void DeleteDomain_DomainNull_Test()
+        {
+            Domain domain = null;
+            var ex = Assert.Throws<ArgumentException>(() => this.domainService.Delete(domain, false));
+            Assert.That(ex.Message, Is.EqualTo("Cannot delete domain, domain is missing"));
+            Assert.Pass();
+        }
+
+        /// <summary>
         /// The DeleteDomain_HasBooks_Test.
         /// </summary>
         [Test]

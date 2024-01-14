@@ -332,6 +332,17 @@ namespace LibraryBLTests
         }
 
         /// <summary>
+        /// The DeleteBookEdition_BookEditionNull_Test.
+        /// </summary>
+        [Test]
+        public void DeleteBookEdition_BookEditionNull_Test()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Delete(null));
+            Assert.That(ex.Message, Is.EqualTo("Cannot delete book edition, bookEdition is null"));
+            Assert.Pass();
+        }
+
+        /// <summary>
         /// The DeleteBookEdition_HasBookSamples_Test.
         /// </summary>
         [Test]

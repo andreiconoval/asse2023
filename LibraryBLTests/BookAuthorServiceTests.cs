@@ -219,6 +219,19 @@ namespace LibraryBLTests
             Assert.Pass();
         }
 
+
+        /// <summary>
+        /// The DeleteDomain_DomainNull_Test.
+        /// </summary>
+        [Test]
+        public void DeleteBookAuthor_BookAuthorNull_Test()
+        {
+            BookAuthor bookAuthor = null;
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Delete(bookAuthor));
+            Assert.That(ex.Message, Is.EqualTo("Cannot delete book author, book author is missing"));
+            Assert.Pass();
+        }
+
         /// <summary>
         /// The SetUpGetBookAuthor.
         /// </summary>

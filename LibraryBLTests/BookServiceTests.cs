@@ -246,6 +246,17 @@ namespace LibraryBLTests
         }
 
         /// <summary>
+        /// The DeleteBook_BookNull_Test.
+        /// </summary>
+        [Test]
+        public void DeleteBook_BookNull_Test()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Delete(null));
+            Assert.That(ex.Message, Is.EqualTo("Cannot delete book, book is missing"));
+            Assert.Pass();
+        }
+
+        /// <summary>
         /// The DeleteBook_HasBookAuthors_Test.
         /// </summary>
         [Test]

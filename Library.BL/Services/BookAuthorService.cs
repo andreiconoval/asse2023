@@ -106,5 +106,21 @@ namespace Library.BL.Services
         {
             throw new Exception("To delete and add new Book author is the best approach");
         }
+
+        /// <summary>
+        /// The Delete.
+        /// </summary>
+        /// <param name="entity">The entity<see cref="BookAuthor"/>.</param>
+        /// <exception cref="ArgumentException"></exception>
+
+        public override void Delete(BookAuthor entity)
+        {
+            if (entity == null)
+            {
+                throw new ArgumentException("Cannot delete book author, book author is missing");
+            }
+
+            base.Delete(entity);
+        }
     }
 }
