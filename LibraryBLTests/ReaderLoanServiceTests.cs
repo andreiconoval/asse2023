@@ -49,11 +49,6 @@ namespace LibraryBLTests
         private Mock<IUserRepository> userRepositoryMock;
 
         /// <summary>
-        /// Defines the librarySettingsRepositoryMock.
-        /// </summary>
-        private Mock<ILibrarySettingsRepository> librarySettingsRepositoryMock;
-
-        /// <summary>
         /// Defines the librarySettingsServiceMock.
         /// </summary>
         private Mock<ILibrarySettingsService> librarySettingsServiceMock;
@@ -67,69 +62,6 @@ namespace LibraryBLTests
         /// Defines the logger.
         /// </summary>
         private Microsoft.Extensions.Logging.ILogger<IReaderLoanService> logger;
-
-        /// <summary>
-        /// Defines the UserStaff.
-        /// </summary>
-        private User userStaff = new User()
-        {
-            Id = 1,
-            LibraryStaff = new LibraryStaff() { UserId = 1 }
-        };
-
-        /// <summary>
-        /// Defines the User1Reader.
-        /// </summary>
-        private User user1Reader = new User()
-        {
-            Id = 2,
-            Reader = new Reader() { UserId = 2 }
-        };
-
-        /// <summary>
-        /// Defines the User2ReaderAndStaff.
-        /// </summary>
-        private User user2ReaderAndStaff = new User()
-        {
-            Id = 3,
-            Reader = new Reader() { UserId = 3 },
-            LibraryStaff = new LibraryStaff() { UserId = 3 }
-        };
-
-        /// <summary>
-        /// Defines the User3Reader.
-        /// </summary>
-        private User user3Reader = new User()
-        {
-            Id = 4,
-            Reader = new Reader() { UserId = 4 }
-        };
-
-        /// <summary>
-        /// Defines the LibrarySettings.
-        /// </summary>
-        private LibrarySettings librarySettings = new LibrarySettings()
-        {
-            AllowedMonthsForSameDomain = 2,
-            BorrowedBooksExtensionLimit = 2,
-            Id = 1,
-            BorrowedBooksPeriod = 10,
-            LimitBookLend = 1,
-            MaxAllowedBooksPerDomain = 2,
-            MaxBookBorrowed = 3,
-            MaxBooksBorrowedPerTime = 3,
-            MaxBorrowedBooksPerDay = 7,
-            MaxDomains = 5,
-            SameBookRepeatBorrowingLimit = 2,
-        };
-
-        /// <summary>
-        /// Defines the ReaderLoan.
-        /// </summary>
-        private List<ReaderLoan> readerLoan = new List<ReaderLoan>()
-        {
-            new ReaderLoan()
-        };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReaderLoanServiceTests"/> class.
@@ -149,8 +81,6 @@ namespace LibraryBLTests
             this.readerLoanRepositoryMock = new Mock<IReaderLoanRepository>();
             this.bookSampleRepositoryMock = new Mock<IBookSampleRepository>();
             this.userRepositoryMock = new Mock<IUserRepository>();
-            this.librarySettingsRepositoryMock = new Mock<ILibrarySettingsRepository>();
-            this.librarySettingsRepositoryMock.Setup(x => x.Get()).Returns(this.librarySettings);
             this.librarySettingsServiceMock = new Mock<ILibrarySettingsService>();
             this.readerLoanService = new ReaderLoanService(
                 this.readerLoanRepositoryMock.Object,
@@ -317,9 +247,7 @@ namespace LibraryBLTests
                         BookEditionId = 201,
                         BookId = 301,
                         ReaderLoanId = 401,
-                        LoanDate = DateTime.Now,
-                        ExpectedReturnDate = DateTime.Now.AddDays(14),
-                        EffectiveReturnDate = null
+                        LoanDate = DateTime.Now
                     }
                 }
             };
