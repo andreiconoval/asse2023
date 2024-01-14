@@ -254,5 +254,6 @@ namespace LibraryBLTests
             Assert.That(ex.Message, Is.EqualTo("Cannot update author, entity is missing"));
             Assert.Pass();
         }
+
     }
 }

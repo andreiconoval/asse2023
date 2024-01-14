@@ -27,6 +27,11 @@ namespace LibraryBLTests
     public class BookDomainServiceTests
     {
         /// <summary>
+        /// Defines the this.librarySettingsServices.
+        /// </summary>
+        private LibrarySettingsService librarySettingsService;
+
+        /// <summary>
         /// Defines the this.service.
         /// </summary>
         private IBookDomainService service;
@@ -73,7 +78,9 @@ namespace LibraryBLTests
         {
             this.domainRepositoryMock = new Mock<IDomainRepository>();
             this.bookDomainRepositoryMock = new Mock<IBookDomainRepository>();
-            this.service = new BookDomainService(this.bookDomainRepositoryMock.Object, this.domainRepositoryMock.Object, this.logger);
+            var librarySettingsRepositoryMock = new Mock<ILibrarySettingsRepository>();
+            this.librarySettingsService = new LibrarySettingsService(librarySettingsRepositoryMock.Object);
+            this.service = new BookDomainService(this.bookDomainRepositoryMock.Object, this.domainRepositoryMock.Object, this.librarySettingsService, this.logger);
         }
 
         /// <summary>
@@ -160,6 +167,8 @@ namespace LibraryBLTests
             this.SetUpGetBookDomain(new List<BookDomain>());
             this.SetUpGetDomain(domains);
 
+            this.librarySettingsService.LibrarySettings = new LibrarySettings { MaxDomains = 4 };
+
             var result = this.service.Insert(this.NewBookDomain);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.IsValid, Is.True);
@@ -219,9 +228,46 @@ namespace LibraryBLTests
             this.SetUpGetBookDomain(bookDomains);
             this.SetUpGetDomain(domains);
 
+            this.librarySettingsService.LibrarySettings = new LibrarySettings { MaxDomains = 4 };
+
             var result = this.service.Insert(this.NewBookDomain);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.IsValid, Is.True);
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The AddBookDomain_ExceededDomainsLimit_Test.
+        /// </summary>
+        [Test]
+        public void AddBookDomain_ExceededDomainsLimit_Test()
+        {
+            var bookDomains = new List<BookDomain>()
+            {
+                new BookDomain
+                {
+                    BookId = 1,
+                    DomainId = 5,
+                    Domain = new Domain { Id = 5 }
+                }
+            };
+
+            var domains = new List<Domain>()
+            {
+                new Domain { Id = 2, DomainId = 1 },
+                new Domain { Id = 1, DomainId = 3 },
+                new Domain { Id = 5, DomainId = 6 },
+                new Domain { Id = 3, DomainId = null },
+                new Domain { Id = 6, DomainId = null },
+            };
+
+            this.librarySettingsService.LibrarySettings = new LibrarySettings { MaxDomains = 1 };
+
+            this.SetUpGetBookDomain(bookDomains);
+            this.SetUpGetDomain(domains);
+
+            var ex = Assert.Throws<ArgumentException>(() => this.service.Insert(this.NewBookDomain));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add book domain, the Domains limit was exceeded!"));
             Assert.Pass();
         }
 

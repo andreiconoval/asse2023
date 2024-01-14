@@ -26,6 +26,7 @@ namespace Library.BL.Services
         /// Defines the _domainRepository.
         /// </summary>
         private readonly IDomainRepository domainRepository;
+        private readonly ILibrarySettingsService librarySettingsService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BookDomainService"/> class.
@@ -36,10 +37,12 @@ namespace Library.BL.Services
         public BookDomainService(
             IBookDomainRepository repository,
             IDomainRepository domainRepository,
+            ILibrarySettingsService librarySettingsService,
             ILogger logger)
             : base(repository, new BookDomainValidator(), logger)
         {
             this.domainRepository = domainRepository;
+            this.librarySettingsService = librarySettingsService;
         }
 
         /// <summary>
@@ -55,7 +58,6 @@ namespace Library.BL.Services
 
                 if (!result.IsValid)
                 {
-                    Logger.LogInformation("Cannot add book domain, invalid entity");
                     throw new ArgumentException("Cannot add book domain, invalid entity");
                 }
 
@@ -64,7 +66,6 @@ namespace Library.BL.Services
 
                 if (bookDomainExists)
                 {
-                    Logger.LogInformation("Cannot add book domain, book domain already exists");
                     throw new ArgumentException("Cannot add book domain, book domain already exists");
                 }
 
@@ -72,8 +73,12 @@ namespace Library.BL.Services
 
                 if (this.IsDomainBookRelationValid(bookDomain, bookDomains, domains))
                 {
-                    Logger.LogInformation("Cannot add book domain, the ancestor-descendant relationship is not valid!");
                     throw new ArgumentException("Cannot add book domain, the ancestor-descendant relationship is not valid!");
+                }
+
+                if (bookDomains.Count() + 1 > this.librarySettingsService.DOMENII)
+                {
+                    throw new ArgumentException("Cannot add book domain, the Domains limit was exceeded!");
                 }
 
                 Repository.Insert(bookDomain);
@@ -82,7 +87,7 @@ namespace Library.BL.Services
             }
             catch (Exception ex)
             {
-                Logger.LogCritical(ex.Message);
+                Logger.LogError(ex.Message);
                 throw;
             }
         }

@@ -415,6 +415,21 @@ namespace LibraryBLTests
         #region CheckIfUserCanExtendForLoan
 
         /// <summary>
+        /// The CheckIfUserCanExtendForLoan_NullUser_Test.
+        /// </summary>
+        [Test]
+        public void CheckIfUserCanExtendForLoan_NullUser_Test()
+        {
+            var librarySettings = this.GetLibrarySettings();
+            librarySettings.BorrowedBooksExtensionLimit = 4;
+            this.SetLibrarySettings(librarySettings);
+
+            var result = this.service.CheckIfUserCanExtendForLoan(null, 1);
+            Assert.That(result, Is.True);
+            Assert.Pass();
+        }
+
+        /// <summary>
         /// The CheckIfUserCanExtendForLoan_UserInd2_False_Test.
         /// </summary>
         [Test]
@@ -454,7 +469,7 @@ namespace LibraryBLTests
             librarySettings.BorrowedBooksExtensionLimit = 4;
             this.SetLibrarySettings(librarySettings);
 
-            var result = this.service.CheckIfUserCanExtendForLoan(User2, 5); 
+            var result = this.service.CheckIfUserCanExtendForLoan(User2, 5);
             Assert.That(result, Is.True);//5<4*2
             Assert.Pass();
         }
@@ -486,6 +501,8 @@ namespace LibraryBLTests
         {
             return new LibrarySettings()
             {
+                Id = 1,
+                MaxDomains = 5,
                 MaxBookBorrowed = 2,
                 MaxBorrowedBooksPerDay = 4,
                 BorrowedBooksPeriod = 10,

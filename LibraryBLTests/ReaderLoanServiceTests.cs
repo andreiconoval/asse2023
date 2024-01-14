@@ -445,11 +445,13 @@ namespace LibraryBLTests
             Assert.Pass();
         }
 
+        #region Validate Loan Details
+
         /// <summary>
-        /// The Insert_BookLoanDetailInvalid_Test.
+        /// The Insert_BookLoanDetailInvalid_BookSampleId_Test.
         /// </summary>
         [Test]
-        public void Insert_BookLoanDetailInvalid_Test()
+        public void Insert_BookLoanDetailInvalid_BookSampleId_Test()
         {
             this.UserRepoGetSetup(new List<User>
             {
@@ -459,6 +461,13 @@ namespace LibraryBLTests
             var bookLoanDetail1 = new BookLoanDetail
             {
                 Id = 1,
+                BookSampleId = 0,
+                BookEditionId = 201,
+                BookId = 301,
+                ReaderLoanId = 401,
+                LoanDate = DateTime.Now,
+                ExpectedReturnDate = DateTime.Now.AddDays(14),
+                EffectiveReturnDate = null
             };
 
             var readerLoan = new ReaderLoan
@@ -475,6 +484,116 @@ namespace LibraryBLTests
             Assert.Pass();
         }
 
+        /// <summary>
+        /// The Insert_BookLoanDetailInvalid_ReaderLoanId_Test.
+        /// </summary>
+        [Test]
+        public void Insert_BookLoanDetailInvalid_ReaderLoanId_Test()
+        {
+            this.UserRepoGetSetup(new List<User>
+            {
+                new User { Id = 1, Email = "test@email.com", Reader = new Reader()},
+                new User { Id = 2, Email = "test@email.com", LibraryStaff = new LibraryStaff()}
+            });
+
+            var bookLoanDetail1 = new BookLoanDetail
+            {
+                Id = 1,
+                BookSampleId = 101,
+                BookEditionId = 201,
+                BookId = 301,
+                ReaderLoanId = 0,
+                LoanDate = DateTime.Now,
+                ExpectedReturnDate = DateTime.Now.AddDays(14),
+                EffectiveReturnDate = null
+            };
+            var readerLoan = new ReaderLoan
+            {
+                StaffId = 2,
+                ReaderId = 1,
+                LoanDate = new DateTime(),
+                BorrowedBooks = 1,
+                BookLoanDetails = new List<BookLoanDetail>() { bookLoanDetail1 }
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.Insert(readerLoan));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book loan detail, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The Insert_BookLoanDetailInvalid_ExpectedReturnDate_Test.
+        /// </summary>
+        [Test]
+        public void Insert_BookLoanDetailInvalid_ExpectedReturnDate_Test()
+        {
+            this.UserRepoGetSetup(new List<User>
+            {
+                new User { Id = 1, Email = "test@email.com", Reader = new Reader()},
+                new User { Id = 2, Email = "test@email.com", LibraryStaff = new LibraryStaff()}
+            });
+
+            var bookLoanDetail1 = new BookLoanDetail
+            {
+                Id = 1,
+                BookSampleId = 101,
+                BookEditionId = 201,
+                BookId = 301,
+                ReaderLoanId = 401,
+                ExpectedReturnDate = DateTime.Now.AddDays(-14),
+                EffectiveReturnDate = null
+            };
+            var readerLoan = new ReaderLoan
+            {
+                StaffId = 2,
+                ReaderId = 1,
+                LoanDate = new DateTime(),
+                BorrowedBooks = 1,
+                BookLoanDetails = new List<BookLoanDetail>() { bookLoanDetail1 }
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.Insert(readerLoan));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book loan detail, entity is invalid"));
+            Assert.Pass();
+        }
+
+        /// <summary>
+        /// The Insert_BookLoanDetailInvalid_EffectiveReturnDate_Test.
+        /// </summary>
+        [Test]
+        public void Insert_BookLoanDetailInvalid_EffectiveReturnDate_Test()
+        {
+            this.UserRepoGetSetup(new List<User>
+            {
+                new User { Id = 1, Email = "test@email.com", Reader = new Reader()},
+                new User { Id = 2, Email = "test@email.com", LibraryStaff = new LibraryStaff()}
+            });
+
+            var bookLoanDetail1 = new BookLoanDetail
+            {
+                Id = 1,
+                BookSampleId = 101,
+                BookEditionId = 201,
+                BookId = 301,
+                ReaderLoanId = 401,
+                ExpectedReturnDate = DateTime.Now.AddDays(14),
+                EffectiveReturnDate = DateTime.Now.AddDays(-14)
+            };
+            var readerLoan = new ReaderLoan
+            {
+                StaffId = 2,
+                ReaderId = 1,
+                LoanDate = new DateTime(),
+                BorrowedBooks = 1,
+                BookLoanDetails = new List<BookLoanDetail>() { bookLoanDetail1 }
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => this.readerLoanService.Insert(readerLoan));
+            Assert.That(ex.Message, Is.EqualTo("Cannot add new book loan detail, entity is invalid"));
+            Assert.Pass();
+        }
+
+        #endregion
 
         /// <summary>
         /// The Insert_BookSampleNotExist_Test.
