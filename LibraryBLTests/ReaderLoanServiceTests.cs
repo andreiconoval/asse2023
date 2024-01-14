@@ -103,10 +103,10 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The Invalid_BookLoan_MissingBooksDetails_Test.
+        /// The Insert_BookLoan_MissingBooksDetails_Test.
         /// </summary>
         [Test]
-        public void Invalid_BookLoan_MissingBooksDetails_Test()
+        public void Insert_BookLoan_MissingBooksDetails_Test()
         {
             var readerLoan = new ReaderLoan
             {
@@ -196,10 +196,10 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The Invalid_BookLoan_EmptyFields_Test.
+        /// The Insert_BookLoan_EmptyFields_Test.
         /// </summary>
         [Test]
-        public void Invalid_BookLoan_EmptyFields_Test()
+        public void Insert_BookLoan_EmptyFields_Test()
         {
             var readerLoan = new ReaderLoan
             {
@@ -227,10 +227,10 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The Invalid_BookLoan_IncorrectCount_Test.
+        /// The Insert_BookLoan_IncorrectCount_Test.
         /// </summary>
         [Test]
-        public void Invalid_BookLoan_IncorrectCount_Test()
+        public void Insert_BookLoan_IncorrectCount_Test()
         {
             var readerLoan = new ReaderLoan
             {
@@ -258,10 +258,10 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The Invalid_BookLoan_MissingReader_Test.
+        /// The Insert_BookLoan_MissingReader_Test.
         /// </summary>
         [Test]
-        public void Invalid_BookLoan_MissingReader_Test()
+        public void Insert_BookLoan_MissingReader_Test()
         {
             var readerLoan = new ReaderLoan
             {
@@ -294,10 +294,10 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The Invalid_BookLoan_UserIsNotReader_Test.
+        /// The Insert_BookLoan_UserIsNotReader_Test.
         /// </summary>
         [Test]
-        public void Invalid_BookLoan_UserIsNotReader_Test()
+        public void Insert_BookLoan_UserIsNotReader_Test()
         {
             this.UserRepoGetSetup(new List<User>
             {
@@ -334,10 +334,10 @@ namespace LibraryBLTests
 
 
         /// <summary>
-        /// The Invalid_BookLoan_UserIsNotReader_Test.
+        /// The Insert_BookLoan_UserIsNotReader_Test.
         /// </summary>
         [Test]
-        public void Invalid_BookLoan_UserIsMissing_Test()
+        public void Insert_BookLoan_UserIsMissing_Test()
         {
             this.UserRepoGetSetup(new List<User>());
 
@@ -369,10 +369,10 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The Invalid_BookLoan_StaffIsMissing_Test.
+        /// The Insert_BookLoan_StaffIsMissing_Test.
         /// </summary>
         [Test]
-        public void Invalid_BookLoan_StaffIsMissing_Test()
+        public void Insert_BookLoan_StaffIsMissing_Test()
         {
             this.UserRepoGetSetup(new List<User>
             {
@@ -407,10 +407,10 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The Invalid_BookLoan_StaffIsMissing_Test.
+        /// The Insert_BookLoan_StaffIsMissing_Test.
         /// </summary>
         [Test]
-        public void Invalid_BookLoan_StaffIsMissingNull_Test()
+        public void Insert_BookLoan_StaffIsMissingNull_Test()
         {
             this.UserRepoGetSetup(new List<User>
             {
@@ -514,7 +514,7 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The Insert_CanntBorrowBooks_Test.
+        /// The Insert_CannotBorrowBooks_Test.
         /// </summary>
         [Test]
         public void Insert_CannotBorrowBooks_Test()
@@ -812,10 +812,10 @@ namespace LibraryBLTests
         }
 
         /// <summary>
-        /// The SetExtensionsForLoan_MaximumExtensionsExceded2_Test.
+        /// The SetExtensionsForLoan_MaximumExtensionsExceeded2_Test.
         /// </summary>
         [Test]
-        public void SetExtensionsForLoan_MaximumExtensionsExceded2_Test()
+        public void SetExtensionsForLoan_MaximumExtensionsExceeded2_Test()
         {
             var bookLoanDetails = new List<BookLoanDetail>
             {
