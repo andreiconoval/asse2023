@@ -143,7 +143,7 @@ namespace Library.BL.Services
 
                 if (fullDatabaseDomain?.BookDomains?.Any() ?? false)
                 {
-                    foreach (var bookDomain in fullDatabaseDomain.BookDomains ?? Enumerable.Empty<BookDomain>())
+                    foreach (var bookDomain in fullDatabaseDomain.BookDomains)
                     {
                         this.bookDomainService.Delete(bookDomain);
                     }

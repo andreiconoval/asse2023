@@ -117,7 +117,8 @@ namespace Library.BL.Services
             }
 
             var loansForNewLoanDay = previousLoans.Where(pl => pl.LoanDate.Date == newLoan.LoanDate.Date).SelectMany(pl => pl.BookLoanDetails).Count();
-
+            
+            //Library staf nu are limita pe zi 
             if (user.LibraryStaff == null &&
                 (newLoan.BookLoanDetails.Count() > NCZ || loansForNewLoanDay + newLoan.BookLoanDetails.Count() > NCZ))
             {
@@ -132,7 +133,7 @@ namespace Library.BL.Services
         /// <param name="totalExtensionsInLastThreeMonths">The total extensions in last three months.</param>
         public bool CheckIfUserCanExtendForLoan(User user, int totalExtensionsInLastThreeMonths)
         {
-            if (user.LibraryStaff == null)
+            if (user?.LibraryStaff == null)
             {
                 USER_IND = 2;
             }
